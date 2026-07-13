@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/props/tree_canopy_large.tscn" id="1_canopy"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/cottage_roof_overhang.tscn" id="2_roof"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/tall_grass_cluster.tscn" id="3_grass"]
+
+[node name="ForegroundDecor" type="Node2D"]
+
+[node name="TreeCanopyWest" parent="." instance=ExtResource("1_canopy")]
+position = Vector2(248, 132)
+
+[node name="TreeCanopyPlazaWest" parent="." instance=ExtResource("1_canopy")]
+position = Vector2(500, 390)
+scale = Vector2(0.95, 0.95)
+
+[node name="TreeCanopyPlazaEast" parent="." instance=ExtResource("1_canopy")]
+position = Vector2(1020, 404)
+scale = Vector2(0.9, 0.9)
+
+[node name="TreeCanopyPond" parent="." instance=ExtResource("1_canopy")]
+position = Vector2(356, 640)
+scale = Vector2(0.86, 0.86)
+
+[node name="TreeCanopyWarm" parent="." instance=ExtResource("1_canopy")]
+position = Vector2(1326, 130)
+scale = Vector2(0.82, 0.82)
+
+[node name="TreeCanopyHome" parent="." instance=ExtResource("1_canopy")]
+position = Vector2(164, 684)
+scale = Vector2(0.8, 0.8)
+
+[node name="HomeRoof" parent="." instance=ExtResource("2_roof")]
+position = Vector2(330, 716)
+
+[node name="GrassFront" parent="." instance=ExtResource("3_grass")]
+position = Vector2(454, 272)
+scale = Vector2(0.8, 0.8)

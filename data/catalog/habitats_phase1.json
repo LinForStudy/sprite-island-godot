@@ -1,0 +1,8 @@
+[
+  {"habitat_id":"grassland","display_name":"草丛","scene_id":"test_world","intro_text":"软软的草坡最容易遇到第一批小岛朋友。","encounter_pool":["leafbun","sproutdeer","vinerabbit","bloomwhale"]},
+  {"habitat_id":"pond","display_name":"池塘","scene_id":"test_world","intro_text":"池塘的水波会带来会发光的小水灵。","encounter_pool":["bubblepup","moonfish","rainseal","starjelly"]},
+  {"habitat_id":"warmstone","display_name":"暖石","scene_id":"test_world","intro_text":"暖石区适合遇见会发光的火系萌灵。","encounter_pool":["emberfox","lanterncub","candlemoth","sunlion"]},
+  {"habitat_id":"windmill","display_name":"风车","scene_id":"grove_gate","intro_text":"风车附近总有带着电光的新朋友。","encounter_pool":["sparkmouse","bellvolt","coilowl","stormalpaca"]},
+  {"habitat_id":"cave","display_name":"山洞","scene_id":"grove_gate","intro_text":"山洞里住着稳稳当当的土系萌灵。","encounter_pool":["pebbletot","mudturtle","crystalbadger","mountainseed"]},
+  {"habitat_id":"cloud","display_name":"云台","scene_id":"grove_gate","intro_text":"云台的风会把轻飘飘的风系萌灵带来。","encounter_pool":["cloudchick","kitehare","whistlecrane","auroradrake"]}
+]

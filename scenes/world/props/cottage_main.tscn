@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/07_house_wall.png" id="1_wall"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/11_door.png" id="2_door"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/14_sign.png" id="3_sign"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/05_fence.png" id="4_fence"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/09_flowers.png" id="5_flowers"]
+
+[node name="CottageMain" type="Node2D"]
+
+[node name="Wall" type="Sprite2D" parent="."]
+texture = ExtResource("1_wall")
+position = Vector2(0, -28)
+scale = Vector2(2.15, 1.95)
+
+[node name="Door" type="Sprite2D" parent="."]
+texture = ExtResource("2_door")
+position = Vector2(0, 22)
+scale = Vector2(1.2, 1.2)
+
+[node name="FenceLeft" type="Sprite2D" parent="."]
+texture = ExtResource("4_fence")
+position = Vector2(-92, 46)
+scale = Vector2(1.18, 1.0)
+
+[node name="FenceRight" type="Sprite2D" parent="."]
+texture = ExtResource("4_fence")
+position = Vector2(92, 46)
+scale = Vector2(-1.18, 1.0)
+
+[node name="Sign" type="Sprite2D" parent="."]
+texture = ExtResource("3_sign")
+position = Vector2(92, 18)
+scale = Vector2(0.92, 0.92)
+
+[node name="FlowersLeft" type="Sprite2D" parent="."]
+texture = ExtResource("5_flowers")
+position = Vector2(-70, 66)
+scale = Vector2(0.7, 0.7)
+
+[node name="FlowersRight" type="Sprite2D" parent="."]
+texture = ExtResource("5_flowers")
+position = Vector2(52, 70)
+scale = Vector2(0.62, 0.62)

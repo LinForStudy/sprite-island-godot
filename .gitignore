@@ -1,0 +1,25 @@
+# Godot generated files and editor state
+.godot/
+.godot_battle_smoke_appdata/
+.godot_battle_smoke_appdata_gui/
+.godot_battle_smoke_localappdata/
+.godot_battle_smoke_localappdata_gui/
+.godot_smoke_appdata/
+.godot_smoke_localappdata/
+.godot-scene-smoke.log
+*.log
+*.tmp
+*.cache
+*.import
+.import/
+# OS
+.DS_Store
+Thumbs.db
+# VS Code
+.vscode/
+# JetBrains
+.idea/
+# Misc
+*.swp
+*.swo
+

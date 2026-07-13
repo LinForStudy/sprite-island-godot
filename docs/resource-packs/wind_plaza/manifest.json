@@ -1,0 +1,96 @@
+{
+  "pack": "萌灵小岛 / Wind Plaza Asset Pack 01",
+  "engine": "Godot 4.x",
+  "files": [
+    {
+      "path": "assets/world/tiles/grass/grass_base_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "seamless_mirrored_tile",
+      "source": "草地花丛纹理图案.png"
+    },
+    {
+      "path": "assets/world/tiles/grass/grass_base_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "seamless_mirrored_tile",
+      "source": "绿意盎然的草地背景.png"
+    },
+    {
+      "path": "assets/world/tiles/grass/grass_base_03.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "seamless_mirrored_tile",
+      "source": "草地花园纹理背景.png"
+    },
+    {
+      "path": "assets/world/tiles/road/plaza_ground.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "seamless_mirrored_tile",
+      "source": "温暖沙土地面纹理.png"
+    },
+    {
+      "path": "assets/world/tiles/road/road_base.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "seamless_mirrored_tile",
+      "source": "沙土小路图案纹理.png"
+    },
+    {
+      "path": "assets/world/props/plaza/plaza_signpost.png",
+      "size": [
+        128,
+        128
+      ],
+      "type": "transparent_prop",
+      "source": "奇幻风格木制指示牌.png"
+    },
+    {
+      "path": "assets/world/props/plaza/small_bush_a.png",
+      "size": [
+        96,
+        96
+      ],
+      "type": "transparent_prop",
+      "source": "可爱绿树丛图标.png"
+    },
+    {
+      "path": "assets/world/props/plaza/small_bush_b.png",
+      "size": [
+        96,
+        96
+      ],
+      "type": "transparent_prop",
+      "source": "绿色灌木丛与温暖花朵.png"
+    },
+    {
+      "path": "assets/world/props/plaza/flower_patch_a.png",
+      "size": [
+        96,
+        96
+      ],
+      "type": "transparent_prop",
+      "source": "花卉草地小岛插画.png"
+    },
+    {
+      "path": "assets/world/props/plaza/stone_small_a.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "transparent_prop",
+      "source": "温暖色调的小圆石.png"
+    }
+  ]
+}

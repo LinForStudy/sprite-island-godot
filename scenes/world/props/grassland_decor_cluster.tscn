@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/tall_grass_cluster_a.png" id="1_grass_a"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/tall_grass_cluster_b.png" id="2_grass_b"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/bush_cluster_large.png" id="3_bush"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/wildflower_cluster.png" id="4_flowers"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/grass_spirit_marker.png" id="5_marker"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/tree_small_a.png" id="6_tree"]
+
+[node name="GrasslandDecorCluster" type="Node2D"]
+
+[node name="TreeSmall" type="Sprite2D" parent="."]
+texture = ExtResource("6_tree")
+position = Vector2(-84, -52)
+scale = Vector2(0.62, 0.62)
+
+[node name="BushLarge" type="Sprite2D" parent="."]
+texture = ExtResource("3_bush")
+position = Vector2(68, -20)
+scale = Vector2(0.68, 0.68)
+
+[node name="TallGrassA" type="Sprite2D" parent="."]
+texture = ExtResource("1_grass_a")
+position = Vector2(-34, 28)
+scale = Vector2(0.72, 0.72)
+
+[node name="TallGrassB" type="Sprite2D" parent="."]
+texture = ExtResource("2_grass_b")
+position = Vector2(46, 48)
+scale = Vector2(0.66, 0.66)
+
+[node name="Wildflowers" type="Sprite2D" parent="."]
+texture = ExtResource("4_flowers")
+position = Vector2(-70, 60)
+scale = Vector2(0.54, 0.54)
+
+[node name="SpiritMarker" type="Sprite2D" parent="."]
+texture = ExtResource("5_marker")
+position = Vector2(10, 2)
+scale = Vector2(0.58, 0.58)
+modulate = Color(1, 1, 1, 0.82)

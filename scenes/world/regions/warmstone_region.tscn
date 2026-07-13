@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/props/warm_stone_cluster.tscn" id="1_warm"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/tree_large_a.tscn" id="2_tree"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/tall_grass_cluster.tscn" id="3_grass"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/route_marker_cluster.tscn" id="4_route"]
+
+[node name="WarmstoneRegion" type="Node2D"]
+
+[node name="MainStone" parent="." instance=ExtResource("1_warm")]
+position = Vector2(1168, 266)
+
+[node name="SideStone" parent="." instance=ExtResource("1_warm")]
+position = Vector2(1260, 222)
+scale = Vector2(0.78, 0.78)
+
+[node name="WarmTree" parent="." instance=ExtResource("2_tree")]
+position = Vector2(1326, 130)
+scale = Vector2(0.88, 0.88)
+
+[node name="WarmGrass" parent="." instance=ExtResource("3_grass")]
+position = Vector2(1100, 186)
+scale = Vector2(0.82, 0.82)
+
+[node name="WarmRoute" parent="." instance=ExtResource("4_route")]
+position = Vector2(1210, 342)
+scale = Vector2(0.76, 0.76)

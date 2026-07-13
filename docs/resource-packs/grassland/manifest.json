@@ -1,0 +1,96 @@
+{
+  "pack": "萌灵小岛 / Grassland Habitat Asset Pack 01",
+  "engine": "Godot 4.x",
+  "files": [
+    {
+      "path": "assets/world/tiles/grass/grassland_ground_01.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "tile",
+      "source": "a_top_down_overhead_seamless_game_art_style_backgr_1_batch_1.png"
+    },
+    {
+      "path": "assets/world/tiles/grass/grassland_ground_02.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "tile",
+      "source": "top_down_overhead_seamless_game_art_style_grassy_m_2_batch_2.png"
+    },
+    {
+      "path": "assets/world/tiles/grass/tall_grass_tile.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "tile",
+      "source": "a_seamless_tileable_top_down_angled_game_art_styl_3_batch_3.png"
+    },
+    {
+      "path": "assets/world/tiles/grass/grass_path_edge.png",
+      "size": [
+        64,
+        64
+      ],
+      "type": "tile",
+      "source": "a_top_down_slightly_stylized_painterly_illustrat_4_batch_4.png"
+    },
+    {
+      "path": "assets/world/props/grassland/tall_grass_cluster_a.png",
+      "size": [
+        128,
+        128
+      ],
+      "type": "transparent_prop",
+      "source": "a_clean_digital_illustration_game_asset_style_sc_5_batch_5.png"
+    },
+    {
+      "path": "assets/world/props/grassland/tall_grass_cluster_b.png",
+      "size": [
+        128,
+        128
+      ],
+      "type": "transparent_prop",
+      "source": "a_single_standalone_digital_illustration_game_a_6_batch_6.png"
+    },
+    {
+      "path": "assets/world/props/grassland/bush_cluster_large.png",
+      "size": [
+        160,
+        128
+      ],
+      "type": "transparent_prop",
+      "source": "a_detailed_stylized_illustration_asset_a_large_7_batch_7.png"
+    },
+    {
+      "path": "assets/world/props/grassland/wildflower_cluster.png",
+      "size": [
+        128,
+        128
+      ],
+      "type": "transparent_prop",
+      "source": "a_detailed_colorful_top_down_slightly_angled_il_8_batch_8.png"
+    },
+    {
+      "path": "assets/world/props/grassland/grass_spirit_marker.png",
+      "size": [
+        128,
+        128
+      ],
+      "type": "transparent_prop",
+      "source": "a_stylized_fantasy_illustration_on_a_transparent_b_9_batch_9.png"
+    },
+    {
+      "path": "assets/world/props/grassland/tree_small_a.png",
+      "size": [
+        160,
+        192
+      ],
+      "type": "transparent_prop",
+      "source": "a_single_isolated_stylized_cartoon_fantasy_tree_o_10_batch_10.png"
+    }
+  ]
+}

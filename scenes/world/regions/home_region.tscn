@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/props/cottage_main.tscn" id="1_home"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/tree_large_a.tscn" id="2_tree"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/route_marker_cluster.tscn" id="3_route"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/pond_edge_cluster.tscn" id="4_edge"]
+
+[node name="HomeRegion" type="Node2D"]
+
+[node name="Cottage" parent="." instance=ExtResource("1_home")]
+position = Vector2(330, 716)
+
+[node name="YardTree" parent="." instance=ExtResource("2_tree")]
+position = Vector2(164, 684)
+scale = Vector2(0.86, 0.86)
+
+[node name="YardDecor" parent="." instance=ExtResource("4_edge")]
+position = Vector2(536, 744)
+scale = Vector2(0.72, 0.72)
+
+[node name="HomeSign" parent="." instance=ExtResource("3_route")]
+position = Vector2(486, 694)
+scale = Vector2(0.78, 0.78)

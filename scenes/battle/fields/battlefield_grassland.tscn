@@ -1,0 +1,300 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle/battlefield.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grassland_ground_01.png" id="2_ground_a"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grassland_ground_02.png" id="3_ground_b"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/tall_grass_tile.png" id="4_tall_tile"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/bush_cluster_large.png" id="5_bush_large"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/tree_small_a.png" id="6_tree_small"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/wildflower_cluster.png" id="7_flowers"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/tall_grass_cluster_a.png" id="8_grass_a"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/tall_grass_cluster_b.png" id="9_grass_b"]
+[ext_resource type="Texture2D" path="res://assets/world/props/plaza/small_bush_a.png" id="10_bush_small"]
+[ext_resource type="Texture2D" path="res://assets/world/props/plaza/stone_small_a.png" id="11_stone"]
+[ext_resource type="Texture2D" path="res://assets/world/props/grassland/grass_spirit_marker.png" id="12_marker"]
+
+[node name="BattlefieldVisual" type="Node2D"]
+script = ExtResource("1_script")
+habitat_id = "grassland"
+
+[node name="BackgroundFar" type="Node2D" parent="."]
+z_index = -60
+
+[node name="SkyWash" type="Polygon2D" parent="BackgroundFar"]
+color = Color(0.78, 0.91, 0.95, 1)
+polygon = PackedVector2Array(-80, -80, 1360, -80, 1360, 410, -80, 470)
+
+[node name="DistantHillBack" type="Polygon2D" parent="BackgroundFar"]
+color = Color(0.66, 0.82, 0.58, 0.82)
+polygon = PackedVector2Array(-80, 315, 110, 258, 310, 302, 520, 240, 760, 300, 1010, 250, 1360, 325, 1360, 450, -80, 462)
+
+[node name="DistantHillFront" type="Polygon2D" parent="BackgroundFar"]
+color = Color(0.54, 0.74, 0.46, 0.78)
+polygon = PackedVector2Array(-80, 365, 130, 312, 360, 350, 585, 304, 820, 350, 1110, 305, 1360, 372, 1360, 490, -80, 500)
+
+[node name="FarTreeLeft" type="Sprite2D" parent="BackgroundFar"]
+position = Vector2(158, 292)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("6_tree_small")
+modulate = Color(0.53, 0.68, 0.48, 0.58)
+
+[node name="FarTreeMid" type="Sprite2D" parent="BackgroundFar"]
+position = Vector2(548, 278)
+scale = Vector2(0.38, 0.38)
+texture = ExtResource("6_tree_small")
+modulate = Color(0.53, 0.68, 0.48, 0.5)
+
+[node name="FarTreeRight" type="Sprite2D" parent="BackgroundFar"]
+position = Vector2(1080, 292)
+scale = Vector2(0.44, 0.44)
+texture = ExtResource("6_tree_small")
+modulate = Color(0.53, 0.68, 0.48, 0.56)
+
+[node name="BackgroundMid" type="Node2D" parent="."]
+z_index = -40
+
+[node name="MidBushLeft" type="Sprite2D" parent="BackgroundMid"]
+position = Vector2(188, 386)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("5_bush_large")
+
+[node name="MidBushRight" type="Sprite2D" parent="BackgroundMid"]
+position = Vector2(1088, 370)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("5_bush_large")
+
+[node name="MidTreeLeft" type="Sprite2D" parent="BackgroundMid"]
+position = Vector2(100, 364)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("6_tree_small")
+
+[node name="MidTreeRight" type="Sprite2D" parent="BackgroundMid"]
+position = Vector2(1186, 366)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("6_tree_small")
+
+[node name="MidFlowersA" type="Sprite2D" parent="BackgroundMid"]
+position = Vector2(476, 408)
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("7_flowers")
+
+[node name="MidFlowersB" type="Sprite2D" parent="BackgroundMid"]
+position = Vector2(986, 424)
+scale = Vector2(0.38, 0.38)
+texture = ExtResource("7_flowers")
+
+[node name="GroundLayer" type="Node2D" parent="."]
+z_index = -30
+
+[node name="GroundShape" type="Polygon2D" parent="GroundLayer"]
+color = Color(0.44, 0.69, 0.38, 1)
+polygon = PackedVector2Array(-80, 386, 1360, 340, 1360, 790, -80, 790)
+
+[node name="Tile00" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(32, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile01" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(160, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile02" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(288, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile03" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(416, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile04" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(544, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile05" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(672, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile06" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(800, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile07" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(928, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile08" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(1056, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile09" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(1184, 416)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile10" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(32, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile11" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(160, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile12" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(288, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile13" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(416, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile14" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(544, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile15" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(672, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile16" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(800, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile17" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(928, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile18" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(1056, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile19" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(1184, 544)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile20" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(32, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile21" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(160, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile22" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(288, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile23" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(416, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile24" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(544, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile25" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(672, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile26" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(800, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile27" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(928, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="Tile28" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(1056, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("2_ground_a")
+
+[node name="Tile29" type="Sprite2D" parent="GroundLayer"]
+position = Vector2(1184, 672)
+scale = Vector2(2, 2)
+texture = ExtResource("3_ground_b")
+
+[node name="PlayerPlatform" type="Node2D" parent="."]
+z_index = -10
+position = Vector2(384, 472)
+
+[node name="PlayerPatch" type="Polygon2D" parent="PlayerPlatform"]
+color = Color(0.53, 0.78, 0.42, 0.88)
+polygon = PackedVector2Array(-172, -34, -122, -68, -34, -82, 78, -72, 156, -36, 176, 4, 134, 38, 34, 52, -82, 42, -160, 12)
+
+[node name="PlayerFlowers" type="Sprite2D" parent="PlayerPlatform"]
+position = Vector2(-112, 12)
+scale = Vector2(0.34, 0.34)
+texture = ExtResource("7_flowers")
+
+[node name="PlayerGrass" type="Sprite2D" parent="PlayerPlatform"]
+position = Vector2(118, -8)
+scale = Vector2(0.34, 0.34)
+texture = ExtResource("8_grass_a")
+
+[node name="EnemyPlatform" type="Node2D" parent="."]
+z_index = -10
+position = Vector2(822, 306)
+
+[node name="EnemyPatch" type="Polygon2D" parent="EnemyPlatform"]
+color = Color(0.55, 0.79, 0.44, 0.84)
+polygon = PackedVector2Array(-128, -28, -84, -54, -8, -62, 78, -50, 126, -18, 132, 18, 82, 42, -10, 46, -98, 32)
+
+[node name="EnemyStone" type="Sprite2D" parent="EnemyPlatform"]
+position = Vector2(96, 15)
+scale = Vector2(0.54, 0.54)
+texture = ExtResource("11_stone")
+
+[node name="EnemyMarker" type="Sprite2D" parent="EnemyPlatform"]
+position = Vector2(-90, -4)
+scale = Vector2(0.28, 0.28)
+texture = ExtResource("12_marker")
+modulate = Color(1, 1, 1, 0.72)
+
+[node name="EnvironmentFront" type="Node2D" parent="."]
+z_index = 35
+
+[node name="FrontGrassLeft" type="Sprite2D" parent="EnvironmentFront"]
+position = Vector2(96, 690)
+scale = Vector2(0.78, 0.78)
+texture = ExtResource("9_grass_b")
+
+[node name="FrontGrassMid" type="Sprite2D" parent="EnvironmentFront"]
+position = Vector2(646, 700)
+scale = Vector2(0.56, 0.56)
+texture = ExtResource("4_tall_tile")
+modulate = Color(1, 1, 1, 0.82)
+
+[node name="FrontGrassRight" type="Sprite2D" parent="EnvironmentFront"]
+position = Vector2(1188, 688)
+scale = Vector2(0.78, 0.78)
+texture = ExtResource("8_grass_a")
+
+[node name="EffectLayer" type="Node2D" parent="."]
+z_index = 60

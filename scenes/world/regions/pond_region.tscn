@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/props/pond_edge_cluster.tscn" id="1_edge"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/tree_large_a.tscn" id="2_tree"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/route_marker_cluster.tscn" id="3_route"]
+
+[node name="PondRegion" type="Node2D"]
+
+[node name="PondEdgeNorth" parent="." instance=ExtResource("1_edge")]
+position = Vector2(180, 544)
+
+[node name="PondEdgeWest" parent="." instance=ExtResource("1_edge")]
+position = Vector2(96, 626)
+scale = Vector2(0.82, 0.82)
+
+[node name="PondEdgeSouth" parent="." instance=ExtResource("1_edge")]
+position = Vector2(248, 676)
+scale = Vector2(0.74, 0.74)
+
+[node name="PondTree" parent="." instance=ExtResource("2_tree")]
+position = Vector2(356, 640)
+scale = Vector2(0.9, 0.9)
+
+[node name="PondRoute" parent="." instance=ExtResource("3_route")]
+position = Vector2(320, 590)
+scale = Vector2(0.84, 0.84)

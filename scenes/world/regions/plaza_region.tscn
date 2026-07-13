@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/props/tree_large_a.tscn" id="1_tree"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/wind_plaza_decor_cluster.tscn" id="2_plaza_decor"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/pond_edge_cluster.tscn" id="3_edge"]
+
+[node name="PlazaRegion" type="Node2D"]
+
+[node name="TreeWest" parent="." instance=ExtResource("1_tree")]
+position = Vector2(500, 390)
+
+[node name="TreeEast" parent="." instance=ExtResource("1_tree")]
+position = Vector2(1020, 404)
+scale = Vector2(0.95, 0.95)
+
+[node name="WelcomeDecor" parent="." instance=ExtResource("2_plaza_decor")]
+position = Vector2(858, 500)
+
+[node name="LeftFlowerStone" parent="." instance=ExtResource("3_edge")]
+position = Vector2(610, 520)
+scale = Vector2(0.62, 0.62)
+
+[node name="RightFlowerStone" parent="." instance=ExtResource("3_edge")]
+position = Vector2(980, 532)
+scale = Vector2(0.56, 0.56)

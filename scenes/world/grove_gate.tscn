@@ -1,0 +1,71 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/world_scene.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://tilesets/world_tiles.tres" id="2_tileset"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialogue_ui.tscn" id="4_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/world/test_npc.tscn" id="5_npc"]
+[ext_resource type="PackedScene" path="res://scenes/world/scene_exit.tscn" id="6_exit"]
+[ext_resource type="Script" path="res://scripts/camera/camera_controller.gd" id="7_camera"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_ui.tscn" id="8_gameplay"]
+
+[node name="GroveGate" type="Node2D"]
+script = ExtResource("1_script")
+scene_id = "grove_gate"
+map_preset = "grove_gate"
+default_spawn_id = "entry_default"
+
+[node name="GroundLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_tileset")
+
+[node name="DecorationLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_tileset")
+
+[node name="CollisionLayer" type="TileMapLayer" parent="."]
+visible = false
+tile_set = ExtResource("2_tileset")
+modulate = Color(1, 1, 1, 0.95)
+
+[node name="TallGrassLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_tileset")
+
+[node name="ForegroundLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_tileset")
+z_index = 20
+
+[node name="CollisionGeometry" type="Node2D" parent="."]
+
+[node name="HabitatPoints" type="Node2D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(768, 448)
+
+[node name="CameraController" type="Camera2D" parent="."]
+script = ExtResource("7_camera")
+target_path = NodePath("../Player")
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="DialogueUI" parent="." instance=ExtResource("4_dialogue")]
+
+[node name="GameplayUI" parent="." instance=ExtResource("8_gameplay")]
+
+[node name="GuideNpc" parent="." instance=ExtResource("5_npc")]
+position = Vector2(832, 240)
+speaker_name = "林门巡护员"
+dialogue_text = "林间入口现在有 3 个探索点：风车、山洞、云台。往南走可以回新手岛，那里还有草丛、池塘和暖石。"
+
+[node name="SouthExit" parent="." instance=ExtResource("6_exit")]
+position = Vector2(768, 808)
+target_scene_path = "res://scenes/world/test_world.tscn"
+target_spawn_id = "entry_from_grove"
+current_exit_id = "south_path"
+display_name = "返回新手岛"
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="entry_default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(768, 448)
+
+[node name="entry_from_south" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(768, 736)

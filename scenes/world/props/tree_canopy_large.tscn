@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/12_tree_crown.png" id="1_canopy"]
+
+[node name="TreeCanopyLarge" type="Node2D"]
+
+[node name="Canopy" type="Sprite2D" parent="."]
+texture = ExtResource("1_canopy")
+position = Vector2(0, -74)
+scale = Vector2(1.9, 1.9)
+z_index = 20

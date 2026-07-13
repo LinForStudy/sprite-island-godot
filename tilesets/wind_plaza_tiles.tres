@@ -1,0 +1,68 @@
+[gd_resource type="TileSet" load_steps=19 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_base_01.png" id="1_grass1"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_base_02.png" id="2_grass2"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_base_03.png" id="3_grass3"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/road/plaza_ground.png" id="4_plaza"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/road/road_base.png" id="5_road"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grassland_ground_01.png" id="6_grassland1"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grassland_ground_02.png" id="7_grassland2"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/tall_grass_tile.png" id="8_tallgrass"]
+[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_path_edge.png" id="9_grassedge"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grass1"]
+texture = ExtResource("1_grass1")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grass2"]
+texture = ExtResource("2_grass2")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grass3"]
+texture = ExtResource("3_grass3")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_plaza"]
+texture = ExtResource("4_plaza")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_road"]
+texture = ExtResource("5_road")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grassland1"]
+texture = ExtResource("6_grassland1")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grassland2"]
+texture = ExtResource("7_grassland2")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tallgrass"]
+texture = ExtResource("8_tallgrass")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grassedge"]
+texture = ExtResource("9_grassedge")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[resource]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_grass1")
+sources/1 = SubResource("TileSetAtlasSource_grass2")
+sources/2 = SubResource("TileSetAtlasSource_grass3")
+sources/3 = SubResource("TileSetAtlasSource_plaza")
+sources/4 = SubResource("TileSetAtlasSource_road")
+sources/5 = SubResource("TileSetAtlasSource_grassland1")
+sources/6 = SubResource("TileSetAtlasSource_grassland2")
+sources/7 = SubResource("TileSetAtlasSource_tallgrass")
+sources/8 = SubResource("TileSetAtlasSource_grassedge")

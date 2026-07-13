@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/14_sign.png" id="1_sign"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/05_fence.png" id="2_fence"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/15_bush.png" id="3_bush"]
+
+[node name="RouteMarkerCluster" type="Node2D"]
+
+[node name="Sign" type="Sprite2D" parent="."]
+texture = ExtResource("1_sign")
+position = Vector2(0, -8)
+scale = Vector2(1.0, 1.0)
+
+[node name="Fence" type="Sprite2D" parent="."]
+texture = ExtResource("2_fence")
+position = Vector2(22, 26)
+scale = Vector2(1.1, 1.0)
+
+[node name="Bush" type="Sprite2D" parent="."]
+texture = ExtResource("3_bush")
+position = Vector2(-42, 24)
+scale = Vector2(0.84, 0.84)

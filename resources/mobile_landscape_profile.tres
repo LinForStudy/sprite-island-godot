@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DeviceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/device_profile.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+profile_id = &"mobile_landscape"
+display_name = "Mobile Landscape"
+camera_zoom = Vector2(1.6, 1.6)
+ui_scale = 1.18
+font_scale = 1.15
+safe_margin_left = 48
+safe_margin_top = 24
+safe_margin_right = 48
+safe_margin_bottom = 24
+touch_button_size = Vector2(120, 120)
+show_virtual_controls = true
+notes = "手机横屏默认档：给后续相机收近、UI 安全区和触控布局使用。"

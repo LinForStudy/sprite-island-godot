@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/home_entry.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-VF.ttf" id="2_font"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_home"]
+radius = 20.0
+
+[node name="HomeEntry" type="Area2D"]
+script = ExtResource("1_script")
+collision_layer = 4
+collision_mask = 4
+monitorable = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_home")
+
+[node name="NameLabel" type="Label" parent="."]
+visible = false
+position = Vector2(-50, -36)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
+text = "萌灵小屋"
