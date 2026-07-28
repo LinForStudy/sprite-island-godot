@@ -194,7 +194,7 @@ func _apply_display_profile(_profile: DeviceProfile) -> void:
 	if not is_node_ready():
 		return
 	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
-	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	var density: float = min(DisplayManager.get_canvas_density_scale(), 1.35) if compact else 1.0
 	modal_shell.call("set_preferred_size", Vector2(740.0, 340.0) * density if compact else Vector2(1080.0, 610.0))
 	layout.add_theme_constant_override("separation", int(round((6.0 * density) if compact else 14.0)))
 	home_content.add_theme_constant_override("separation", int(round((8.0 * density) if compact else 18.0)))
@@ -217,7 +217,7 @@ func _apply_display_profile(_profile: DeviceProfile) -> void:
 
 func _configure_partner_card(card: Button) -> void:
 	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
-	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	var density: float = min(DisplayManager.get_canvas_density_scale(), 1.35) if compact else 1.0
 	card.custom_minimum_size = Vector2(64.0, 82.0) * density if compact else Vector2(104.0, 140.0)
 	var card_portrait: TextureRect = card.get_node("Card/Layout/Portrait") as TextureRect
 	var card_name: Label = card.get_node("Card/Layout/Name") as Label
@@ -229,7 +229,7 @@ func _configure_partner_card(card: Button) -> void:
 
 func _configure_stat_meter(meter: VBoxContainer) -> void:
 	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
-	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	var density: float = min(DisplayManager.get_canvas_density_scale(), 1.35) if compact else 1.0
 	var meter_label: Label = meter.get_node("Header/Label") as Label
 	var meter_value: Label = meter.get_node("Header/Value") as Label
 	var meter_bar: ProgressBar = meter.get_node("Bar") as ProgressBar

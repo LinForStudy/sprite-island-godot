@@ -76,7 +76,7 @@ func _apply_display_profile(_profile: DeviceProfile) -> void:
 	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
 	var safe: Vector4i = DisplayManager.get_safe_margins()
 	var compact: bool = DisplayManager.is_mobile_layout() or viewport_size.y < 560.0
-	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	var density: float = min(DisplayManager.get_canvas_density_scale(), 1.35) if compact else 1.0
 	var outer_gap: float = (12.0 * density) if compact else 24.0
 	modal_center.offset_left = float(safe.x) + outer_gap
 	modal_center.offset_top = float(safe.y) + outer_gap

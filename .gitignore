@@ -25,3 +25,7 @@ Thumbs.db
 *.swp
 *.swo
 
+# Isolated Godot smoke-test profiles and Codex visual previews
+.godot_*/
+.godot-*.log
+.codex_tmp_*
