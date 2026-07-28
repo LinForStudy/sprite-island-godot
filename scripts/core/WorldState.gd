@@ -14,27 +14,6 @@ var last_player_facing: String = "down"
 var dialogue_open: bool = false
 
 
-func _ready() -> void:
-	_ensure_input_map()
-
-
-func _ensure_input_map() -> void:
-	_register_action("move_up", [KEY_W, KEY_UP])
-	_register_action("move_down", [KEY_S, KEY_DOWN])
-	_register_action("move_left", [KEY_A, KEY_LEFT])
-	_register_action("move_right", [KEY_D, KEY_RIGHT])
-	_register_action("interact", [KEY_E, KEY_SPACE, KEY_ENTER])
-
-
-func _register_action(action_name: String, keycodes: Array[int]) -> void:
-	if not InputMap.has_action(action_name):
-		InputMap.add_action(action_name)
-	if InputMap.action_get_events(action_name).is_empty():
-		for keycode in keycodes:
-			var event: InputEventKey = InputEventKey.new()
-			event.physical_keycode = keycode
-			event.keycode = keycode
-			InputMap.action_add_event(action_name, event)
 
 
 func register_scene(scene_id: String) -> void:

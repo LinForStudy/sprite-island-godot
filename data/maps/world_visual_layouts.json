@@ -1,0 +1,40 @@
+{
+  "test_world": {
+    "visual_size": [24, 14],
+    "ground_source": "grass_1",
+    "ground_variants": [
+      {"source": "grass_2", "cells": [[1,1],[4,8],[8,1],[14,2],[18,6],[22,3],[2,12],[16,12]]}
+    ],
+    "rects": [
+      {"source": "plaza", "rect": [10,6,4,3]},
+      {"source": "road", "rect": [8,5,4,2]}, {"source": "road", "rect": [7,4,3,2]}, {"source": "road", "rect": [5,3,4,2]},
+      {"source": "road", "rect": [8,8,4,2]}, {"source": "road", "rect": [7,9,3,2]}, {"source": "road", "rect": [5,10,4,2]}, {"source": "road", "rect": [4,11,3,2]},
+      {"source": "road", "rect": [13,8,4,2]}, {"source": "road", "rect": [15,9,4,2]}, {"source": "road", "rect": [17,10,5,2]}, {"source": "road", "rect": [20,11,4,2]}
+    ],
+    "details": [
+      {"source": "grass_edge", "cells": [[7,6],[6,5],[4,4],[9,3],[9,10],[6,9],[4,10],[3,11],[7,12],[14,10],[16,11],[19,12],[22,10],[23,13]]},
+      {"source": "grassland_1", "cells": [[3,2],[4,2],[5,2],[6,2],[2,3],[3,3],[4,3],[6,3],[2,4],[3,4],[4,4],[3,5],[4,5]]},
+      {"source": "tall_grass", "cells": [[3,3],[4,3],[3,4],[4,4]]},
+      {"source": "grass_edge", "cells": [[5,2],[5,3],[4,5]]},
+      {"source": "water", "cells": [[2,8],[3,8],[4,8],[5,8],[2,9],[3,9],[4,9],[5,9],[3,10],[4,10]]},
+      {"source": "warm_soil", "cells": [[17,3],[18,3],[19,3],[17,4],[18,4],[19,4],[20,4],[18,5],[19,5],[20,5]]}
+    ]
+  },
+  "grove_gate": {
+    "visual_size": [24, 14],
+    "ground_source": "grass_1",
+    "ground_variants": [
+      {"source": "grass_2", "cells": [[2,2],[7,1],[14,1],[21,2],[1,7],[5,12],[15,8],[22,11],[18,13]]}
+    ],
+    "rects": [
+      {"source": "road", "rect": [11,1,2,13]}, {"source": "road", "rect": [4,3,8,2]}, {"source": "road", "rect": [12,3,8,2]},
+      {"source": "road", "rect": [8,7,4,2]}, {"source": "road", "rect": [7,8,3,4]},
+      {"source": "warm_soil", "rect": [3,2,4,4]}, {"source": "grassland_1", "rect": [7,9,4,3]}, {"source": "plaza", "rect": [17,2,4,4]}
+    ],
+    "details": [
+      {"source": "grass_edge", "cells": [[3,2],[4,2],[6,3],[3,5],[6,5]]},
+      {"source": "tall_grass", "cells": [[7,9],[8,10],[9,10],[10,11]]},
+      {"source": "water", "cells": [[17,2],[20,2],[17,5],[20,5]]}
+    ]
+  }
+}

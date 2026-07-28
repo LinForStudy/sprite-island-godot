@@ -80,9 +80,12 @@ func _check_exp_and_capture_rules() -> void:
 func _check_save_defaults() -> void:
 	var save_manager: Node = SaveManagerScript.new()
 	var normalized: Dictionary = save_manager.call("_normalize_save_data", {})
-	_expect(int(normalized.version) == 1, "save version should default to 1")
+	_expect(int(normalized.version) == 2, "save version should default to 2")
 	_expect(normalized.has("discovered"), "save should include discovered")
 	_expect(normalized.has("captured"), "save should include captured")
+	_expect(normalized.has("party"), "save should include party")
+	_expect(normalized.has("inventory"), "save should include inventory")
+	_expect(normalized.has("habitat_capture_counts"), "save should include habitat capture counts")
 	_expect(normalized.has("exploration_streak"), "save should include exploration streak")
 	save_manager.queue_free()
 

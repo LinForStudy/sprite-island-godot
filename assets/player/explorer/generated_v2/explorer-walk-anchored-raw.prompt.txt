@@ -1,0 +1,9 @@
+Image 1 is the exact explorer character identity and art reference. Image 2 is a scale-and-root template made from that same accepted character. Create the final production-ready top-down overworld walk sheet.
+
+Preserve Image 1’s exact face, tan explorer hat with green leaf ribbon, short dark-brown hair, cream shirt, green neck ribbon, warm-brown shorts and belt, small brown backpack, orange-brown shoes, youthful proportions, crisp warm hand-painted cartoon style, and clean modern pixel-art-inspired readability. Preserve Image 2’s exact 4x4 cell locations, fixed camera distance, standing anatomical scale, body-root position, grounded foot-contact line, and padding. Change only the facing direction and walk pose; never zoom or resize a pose to fill its cell.
+
+Exactly 16 equal invisible cells in a 4-row x 4-column grid. Row 1 faces down, row 2 faces left, row 3 faces right, row 4 faces up. In every row: column 1 neutral contact, column 2 first step, column 3 neutral passing pose, column 4 opposite step. Hat, head, torso, limb thickness, clothing, backpack, and shoe scale must remain constant in every cell. Every pair of feet must touch the exact same horizontal foot-contact line defined by Image 2. Each full body must fit entirely inside its cell with generous margin. No body part may cross a cell edge.
+
+Use the layout template only for cell placement, scale, body root, feet line, and padding. Do not reproduce visible boxes, safe-area marks, center marks, labels, borders, or guides. No text, UI, speech bubbles, props, scenery, platform, ground shadow, or detached effects.
+
+Background must be 100% solid flat #FF00FF magenta in every pixel outside the character, with no gradients, texture, lighting, shadow, or color variation in the background.

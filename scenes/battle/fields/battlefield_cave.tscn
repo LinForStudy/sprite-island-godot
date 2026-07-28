@@ -1,99 +1,123 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/battle/battlefield.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_base_01.png" id="2_ground"]
-[ext_resource type="Texture2D" path="res://assets/world/props/plaza/small_bush_a.png" id="3_bush"]
-[ext_resource type="Texture2D" path="res://assets/world/props/plaza/flower_patch_a.png" id="4_flowers"]
-[ext_resource type="Texture2D" path="res://assets/world/props/plaza/stone_small_a.png" id="5_stone"]
+[ext_resource type="TileSet" path="res://tilesets/wind_plaza_tiles.tres" id="2_tileset"]
+[ext_resource type="Texture2D" path="res://assets/world/props/rock_tile.png" id="3_rock"]
+[ext_resource type="Texture2D" path="res://assets/world/props/plaza/stone_small_a.png" id="4_stone"]
+
+[sub_resource type="RectangleShape2D" id="BoundsHorizontal"]
+size = Vector2(1280, 32)
+
+[sub_resource type="RectangleShape2D" id="BoundsVertical"]
+size = Vector2(32, 720)
 
 [node name="BattlefieldVisual" type="Node2D"]
 script = ExtResource("1_script")
-habitat_id = "fallback"
+habitat_id = "cave"
+field_signature = "cave-crystal-vault-v2"
+foundation_source_ids = PackedInt32Array(10, 3)
+foundation_start_row = 4
 
-[node name="BackgroundFar" type="Node2D" parent="."]
-z_index = -60
+[node name="CaveFoundation" type="Polygon2D" parent="."]
+z_index = -5
+color = Color(0.18, 0.2, 0.27, 1)
+polygon = PackedVector2Array(-64, -64, 1344, -64, 1344, 784, -64, 784)
 
-[node name="SkyWash" type="Polygon2D" parent="BackgroundFar"]
-color = Color(0.76, 0.86, 0.92, 1)
-polygon = PackedVector2Array(-80, -80, 1360, -80, 1360, 420, -80, 470)
+[node name="CaveOpening" type="Polygon2D" parent="."]
+z_index = -4
+color = Color(0.35, 0.39, 0.47, 1)
+polygon = PackedVector2Array(120, 446, 170, 212, 292, 96, 474, 54, 652, 88, 826, 48, 1014, 104, 1132, 230, 1186, 446)
 
-[node name="DistantLand" type="Polygon2D" parent="BackgroundFar"]
-color = Color(0.57, 0.68, 0.54, 0.8)
-polygon = PackedVector2Array(-80, 350, 240, 292, 560, 342, 880, 300, 1360, 356, 1360, 488, -80, 488)
+[node name="CrystalGlow" type="Polygon2D" parent="."]
+z_index = -3
+color = Color(0.42, 0.78, 0.9, 0.48)
+polygon = PackedVector2Array(934, 338, 972, 226, 1010, 338, 984, 390)
 
-[node name="BackgroundMid" type="Node2D" parent="."]
-z_index = -40
+[node name="FoundationTiles" type="TileMapLayer" parent="."]
+z_index = -2
+tile_set = ExtResource("2_tileset")
+modulate = Color(0.48, 0.5, 0.58, 1)
 
-[node name="MidBushA" type="Sprite2D" parent="BackgroundMid"]
-position = Vector2(190, 398)
-scale = Vector2(0.75, 0.75)
-texture = ExtResource("3_bush")
+[node name="BackgroundProps" type="Node2D" parent="."]
+z_index = -1
 
-[node name="MidBushB" type="Sprite2D" parent="BackgroundMid"]
-position = Vector2(1080, 388)
-scale = Vector2(0.75, 0.75)
-texture = ExtResource("3_bush")
+[node name="RockColumnLeft" type="Sprite2D" parent="BackgroundProps"]
+position = Vector2(86, 360)
+scale = Vector2(2.0, 3.8)
+texture = ExtResource("3_rock")
+modulate = Color(0.38, 0.4, 0.48, 1)
 
-[node name="GroundLayer" type="Node2D" parent="."]
-z_index = -30
+[node name="RockColumnRight" type="Sprite2D" parent="BackgroundProps"]
+position = Vector2(1200, 348)
+scale = Vector2(2.2, 4.0)
+texture = ExtResource("3_rock")
+modulate = Color(0.38, 0.4, 0.48, 1)
 
-[node name="GroundShape" type="Polygon2D" parent="GroundLayer"]
-color = Color(0.48, 0.66, 0.42, 1)
-polygon = PackedVector2Array(-80, 390, 1360, 344, 1360, 790, -80, 790)
+[node name="ActorPlatforms" type="Node2D" parent="."]
 
-[node name="GroundTileA" type="Sprite2D" parent="GroundLayer"]
-position = Vector2(220, 520)
-scale = Vector2(4, 4)
-texture = ExtResource("2_ground")
-
-[node name="GroundTileB" type="Sprite2D" parent="GroundLayer"]
-position = Vector2(540, 542)
-scale = Vector2(4, 4)
-texture = ExtResource("2_ground")
-
-[node name="GroundTileC" type="Sprite2D" parent="GroundLayer"]
-position = Vector2(860, 520)
-scale = Vector2(4, 4)
-texture = ExtResource("2_ground")
-
-[node name="GroundTileD" type="Sprite2D" parent="GroundLayer"]
-position = Vector2(1180, 542)
-scale = Vector2(4, 4)
-texture = ExtResource("2_ground")
-
-[node name="PlayerPlatform" type="Node2D" parent="."]
-z_index = -10
+[node name="PlayerStoneShelf" type="Polygon2D" parent="ActorPlatforms"]
 position = Vector2(384, 472)
+color = Color(0.46, 0.48, 0.55, 0.96)
+polygon = PackedVector2Array(-178, -30, -126, -64, -36, -78, 70, -68, 150, -34, 178, 6, 126, 38, 24, 50, -92, 42, -166, 10)
 
-[node name="PlayerPatch" type="Polygon2D" parent="PlayerPlatform"]
-color = Color(0.57, 0.76, 0.48, 0.86)
-polygon = PackedVector2Array(-162, -32, -92, -62, 42, -68, 160, -26, 164, 18, 92, 46, -52, 48, -154, 12)
+[node name="PlayerStone" type="Sprite2D" parent="ActorPlatforms"]
+position = Vector2(254, 494)
+scale = Vector2(1.45, 1.45)
+texture = ExtResource("4_stone")
+modulate = Color(0.62, 0.68, 0.76, 1)
 
-[node name="PlayerFlowers" type="Sprite2D" parent="PlayerPlatform"]
-position = Vector2(-112, 10)
-scale = Vector2(0.42, 0.42)
-texture = ExtResource("4_flowers")
+[node name="EnemyStoneShelf" type="Polygon2D" parent="ActorPlatforms"]
+position = Vector2(822, 306)
+color = Color(0.51, 0.54, 0.61, 0.94)
+polygon = PackedVector2Array(-132, -26, -82, -54, -4, -60, 76, -48, 126, -16, 132, 18, 82, 42, -8, 46, -100, 32)
 
-[node name="EnemyPlatform" type="Node2D" parent="."]
-z_index = -10
+[node name="ForegroundOccluders" type="Node2D" parent="."]
+z_index = 30
+
+[node name="FrontRockLeft" type="Sprite2D" parent="ForegroundOccluders"]
+position = Vector2(40, 682)
+scale = Vector2(2.5, 2.5)
+texture = ExtResource("3_rock")
+modulate = Color(0.28, 0.29, 0.36, 1)
+
+[node name="FrontRockRight" type="Sprite2D" parent="ForegroundOccluders"]
+position = Vector2(1240, 684)
+scale = Vector2(2.65, 2.65)
+texture = ExtResource("3_rock")
+modulate = Color(0.28, 0.29, 0.36, 1)
+
+[node name="SceneHooks" type="Node2D" parent="."]
+[node name="PlayerSpawnLeft" type="Marker2D" parent="SceneHooks"]
+position = Vector2(288, 452)
+[node name="PlayerSpawnCenter" type="Marker2D" parent="SceneHooks"]
+position = Vector2(384, 452)
+[node name="PlayerSpawnRight" type="Marker2D" parent="SceneHooks"]
+position = Vector2(480, 452)
+[node name="EnemySpawn" type="Marker2D" parent="SceneHooks"]
 position = Vector2(822, 306)
 
-[node name="EnemyPatch" type="Polygon2D" parent="EnemyPlatform"]
-color = Color(0.57, 0.76, 0.48, 0.8)
-polygon = PackedVector2Array(-124, -28, -64, -52, 44, -54, 126, -18, 126, 18, 58, 42, -74, 38)
-
-[node name="EnemyStone" type="Sprite2D" parent="EnemyPlatform"]
-position = Vector2(96, 16)
-scale = Vector2(0.52, 0.52)
-texture = ExtResource("5_stone")
-
-[node name="EnvironmentFront" type="Node2D" parent="."]
-z_index = 35
-
-[node name="FrontFlowers" type="Sprite2D" parent="EnvironmentFront"]
-position = Vector2(80, 690)
-scale = Vector2(0.55, 0.55)
-texture = ExtResource("4_flowers")
-
-[node name="EffectLayer" type="Node2D" parent="."]
-z_index = 60
+[node name="ArenaCollision" type="Node2D" parent="."]
+[node name="Top" type="StaticBody2D" parent="ArenaCollision"]
+collision_layer = 4
+collision_mask = 0
+[node name="Shape" type="CollisionShape2D" parent="ArenaCollision/Top"]
+position = Vector2(640, -16)
+shape = SubResource("BoundsHorizontal")
+[node name="Bottom" type="StaticBody2D" parent="ArenaCollision"]
+collision_layer = 4
+collision_mask = 0
+[node name="Shape" type="CollisionShape2D" parent="ArenaCollision/Bottom"]
+position = Vector2(640, 736)
+shape = SubResource("BoundsHorizontal")
+[node name="Left" type="StaticBody2D" parent="ArenaCollision"]
+collision_layer = 4
+collision_mask = 0
+[node name="Shape" type="CollisionShape2D" parent="ArenaCollision/Left"]
+position = Vector2(-16, 360)
+shape = SubResource("BoundsVertical")
+[node name="Right" type="StaticBody2D" parent="ArenaCollision"]
+collision_layer = 4
+collision_mask = 0
+[node name="Shape" type="CollisionShape2D" parent="ArenaCollision/Right"]
+position = Vector2(1296, 360)
+shape = SubResource("BoundsVertical")

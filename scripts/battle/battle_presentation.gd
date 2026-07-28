@@ -21,6 +21,7 @@ var _effect_layer: Node2D
 var _camera: Camera2D
 var _camera_home: Vector2 = Vector2.ZERO
 var _callback: Callable = Callable()
+var _active_result: BattleActionResult = null
 var _is_playing: bool = false
 var _all_tweens: Array[Tween] = []
 
@@ -44,11 +45,13 @@ func play_action(result: BattleActionResult, callback: Callable) -> void:
 		return
 	_is_playing = true
 	_callback = callback
+	_active_result = result
 	var attacker: BattleActor = _player_actor if result.attacker_side == "player" else _enemy_actor
 	var defender: BattleActor = _enemy_actor if result.attacker_side == "player" else _player_actor
 	attacker.set_facing_toward(defender.global_position)
 	defender.set_facing_toward(attacker.global_position)
 	current_state = PresentationState.PLAYER_PREPARE if result.attacker_side == "player" else PresentationState.ENEMY_PREPARE
+	_play_audio(&"play_skill")
 	if result.is_heal:
 		_play_heal(attacker, result)
 	elif result.skill != null and result.skill.skill_role == "ultimate":
@@ -60,10 +63,19 @@ func play_action(result: BattleActionResult, callback: Callable) -> void:
 
 func force_cancel() -> void:
 	_kill_all_tweens()
-	if _player_actor: _player_actor.reset_to_home()
-	if _enemy_actor: _enemy_actor.reset_to_home()
-	if _camera: _camera.position = _camera_home
-	if BattleManager.pending_result != null: _snap_hp_to_result(BattleManager.pending_result)
+	var result: BattleActionResult = BattleManager.pending_result
+	if result != null:
+		_snap_hp_to_result(result)
+		var defeated_actor: BattleActor = _enemy_actor if result.defender_side == "enemy" else _player_actor
+		if result.defender_defeated:
+			_play_defeat(defeated_actor)
+	if _player_actor and (result == null or not result.defender_defeated or result.defender_side != "player"):
+		_player_actor.reset_to_home()
+	if _enemy_actor and (result == null or not result.defender_defeated or result.defender_side != "enemy"):
+		_enemy_actor.reset_to_home()
+	if _camera:
+		_camera.position = _camera_home
+	_active_result = null
 	_is_playing = false
 	current_state = PresentationState.ROUND_RESOLVE
 
@@ -71,11 +83,13 @@ func _play_tap(attacker: BattleActor, defender: BattleActor, result: BattleActio
 	var direction: Vector2 = (defender.global_position - attacker.global_position).normalized()
 	var target: Vector2 = defender.global_position - direction * 92.0
 	var tween: Tween = _track(create_tween())
+	tween.tween_callback(func() -> void: current_state = PresentationState.PLAYER_MOVE; attacker.play_combat_action(&"move"))
 	tween.tween_property(attacker, "global_position", target, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_callback(func() -> void: current_state = PresentationState.PLAYER_ATTACK if result.attacker_side == "player" else PresentationState.ENEMY_ATTACK; _pulse_actor(attacker, Vector2(1.13, 0.88)); _spawn_target_marker(defender); _spawn_splash(defender.get_effect_position()))
+	tween.tween_callback(func() -> void: current_state = PresentationState.PLAYER_ATTACK if result.attacker_side == "player" else PresentationState.ENEMY_ATTACK; attacker.play_combat_action(&"attack"); _pulse_actor(attacker, Vector2(1.13, 0.88)); _spawn_target_marker(defender); _spawn_splash(defender.get_effect_position()))
 	tween.tween_interval(HIT_STOP_DURATION)
 	tween.tween_callback(func() -> void: _hit(defender, result))
 	tween.tween_interval(0.34)
+	tween.tween_callback(func() -> void: attacker.play_combat_action(&"move"))
 	tween.tween_property(attacker, "global_position", attacker.get_home_position(), 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_callback(_finish)
 
@@ -83,23 +97,24 @@ func _play_rush(attacker: BattleActor, defender: BattleActor, result: BattleActi
 	var direction: Vector2 = (defender.global_position - attacker.global_position).normalized()
 	var target: Vector2 = defender.global_position - direction * 76.0
 	var tween: Tween = _track(create_tween())
-	tween.tween_callback(func() -> void: _pulse_actor(attacker, Vector2(0.85, 1.16)); _spawn_charge(attacker.get_effect_position()))
+	tween.tween_callback(func() -> void: current_state = PresentationState.PLAYER_MOVE; attacker.play_combat_action(&"move"); _pulse_actor(attacker, Vector2(0.85, 1.16)); _spawn_charge(attacker.get_effect_position()))
 	tween.tween_interval(0.16)
 	tween.tween_property(attacker, "global_position", target, 0.13).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-	tween.tween_callback(func() -> void: _spawn_target_marker(defender); _spawn_splash(defender.get_effect_position()); _camera_shake(10.0); _hit(defender, result))
+	tween.tween_callback(func() -> void: current_state = PresentationState.PLAYER_ATTACK if result.attacker_side == "player" else PresentationState.ENEMY_ATTACK; attacker.play_combat_action(&"attack"); _spawn_target_marker(defender); _spawn_splash(defender.get_effect_position()); _camera_shake(10.0); _hit(defender, result))
 	tween.tween_interval(0.38)
+	tween.tween_callback(func() -> void: attacker.play_combat_action(&"move"))
 	tween.tween_property(attacker, "global_position", attacker.get_home_position(), 0.24).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_callback(_finish)
 
 func _play_heal(attacker: BattleActor, result: BattleActionResult) -> void:
 	var tween: Tween = _track(create_tween())
-	tween.tween_callback(func() -> void: _spawn_shield(attacker.get_effect_position()); _pulse_actor(attacker, Vector2(1.08, 0.94)); _spawn_floating_text(attacker, result); _tween_hp(result))
+	tween.tween_callback(func() -> void: attacker.play_combat_action(&"attack"); _spawn_shield(attacker.get_effect_position()); _pulse_actor(attacker, Vector2(1.08, 0.94)); _spawn_floating_text(attacker, result); _tween_hp(result))
 	tween.tween_interval(0.68)
 	tween.tween_callback(_finish)
 
 func _play_tide(attacker: BattleActor, defender: BattleActor, result: BattleActionResult) -> void:
 	var tween: Tween = _track(create_tween())
-	tween.tween_callback(func() -> void: _darken_field(); _spawn_target_marker(defender); _spawn_tide(attacker.global_position, defender.global_position))
+	tween.tween_callback(func() -> void: attacker.play_combat_action(&"attack"); _darken_field(); _spawn_target_marker(defender); _spawn_tide(attacker.global_position, defender.global_position))
 	tween.tween_interval(0.30)
 	tween.tween_callback(func() -> void: _camera_shake(9.0); _hit(defender, result))
 	tween.tween_interval(0.62)
@@ -108,10 +123,23 @@ func _play_tide(attacker: BattleActor, defender: BattleActor, result: BattleActi
 func _hit(defender: BattleActor, result: BattleActionResult) -> void:
 	current_state = PresentationState.ENEMY_HURT if result.attacker_side == "player" else PresentationState.PLAYER_HURT
 	defender.play_combat_action(&"hurt")
+	_play_audio(&"play_hurt")
 	_flash_actor(defender)
 	_knockback(defender)
 	_spawn_floating_text(defender, result)
 	_tween_hp(result)
+	if result.defender_defeated:
+		var defeat_tween: Tween = _track(create_tween())
+		defeat_tween.tween_interval(0.22)
+		defeat_tween.tween_callback(func() -> void: _play_defeat(defender))
+
+func _play_defeat(defender: BattleActor) -> void:
+	current_state = PresentationState.BATTLE_END
+	defender.play_combat_action(&"defeat")
+	var tween: Tween = _track(create_tween())
+	tween.tween_property(defender.visual_root, "position:y", 14.0, 0.34).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(defender.visual_root, "modulate:a", 0.35, 0.34)
+	tween.parallel().tween_property(defender.shadow, "modulate:a", 0.14, 0.34)
 
 func _tween_hp(result: BattleActionResult) -> void:
 	var bar: TextureProgressBar = _player_hp_bar if (result.is_heal and result.attacker_side == "player") or (not result.is_heal and result.attacker_side == "enemy") else _enemy_hp_bar
@@ -133,9 +161,10 @@ func _knockback(actor: BattleActor) -> void:
 	tween.tween_property(actor, "global_position", home, 0.18)
 
 func _pulse_actor(actor: BattleActor, peak: Vector2) -> void:
+	var base_scale: Vector2 = actor.visual_root.scale
 	var tween: Tween = _track(create_tween())
-	tween.tween_property(actor.visual_root, "scale", Vector2(peak.x * actor.visual_root.scale.x, peak.y), 0.10)
-	tween.tween_property(actor.visual_root, "scale", Vector2(actor.visual_root.scale.x, 1.0), 0.16)
+	tween.tween_property(actor.visual_root, "scale", Vector2(peak.x * base_scale.x, peak.y * base_scale.y), 0.10)
+	tween.tween_property(actor.visual_root, "scale", base_scale, 0.16)
 
 func _camera_shake(amplitude: float) -> void:
 	if _camera == null: return
@@ -237,12 +266,23 @@ func _kill_all_tweens() -> void:
 		if tween != null and tween.is_valid(): tween.kill()
 	_all_tweens.clear()
 
+func _play_audio(method_name: StringName) -> void:
+	var audio_manager: Node = get_node_or_null("/root/AudioManager")
+	if audio_manager != null:
+		audio_manager.call(method_name)
+
 func _finish() -> void:
-	if _player_actor: _player_actor.reset_to_home(); _player_actor.play_combat_action(&"idle")
-	if _enemy_actor: _enemy_actor.reset_to_home(); _enemy_actor.play_combat_action(&"idle")
-	if _camera: _camera.position = _camera_home
+	var defeated_side: String = _active_result.defender_side if _active_result != null and _active_result.defender_defeated else ""
+	if _player_actor and defeated_side != "player":
+		_player_actor.reset_to_home()
+	if _enemy_actor and defeated_side != "enemy":
+		_enemy_actor.reset_to_home()
+	if _camera:
+		_camera.position = _camera_home
 	_is_playing = false
-	current_state = PresentationState.ROUND_RESOLVE
+	current_state = PresentationState.BATTLE_END if defeated_side != "" else PresentationState.ROUND_RESOLVE
+	_active_result = null
 	var callback: Callable = _callback
 	_callback = Callable()
-	if callback.is_valid(): callback.call()
+	if callback.is_valid():
+		callback.call()

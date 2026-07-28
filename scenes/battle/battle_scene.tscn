@@ -234,7 +234,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 16.0
-offset_top = -205.0
+offset_top = -260.0
 offset_right = -16.0
 offset_bottom = -10.0
 grow_horizontal = 2
@@ -297,31 +297,29 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="PositionLabel" type="Label" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea"]
-visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.470588, 0.4, 0.313725, 1)
 theme_override_font_sizes/font_size = 15
 text = "选择站位"
 
 [node name="PositionRow" type="HBoxContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea"]
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="PositionLeft" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow"]
-custom_minimum_size = Vector2(96, 44)
+custom_minimum_size = Vector2(96, 38)
 toggle_mode = true
 layout_mode = 2
 text = "左侧"
 
 [node name="PositionCenter" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow"]
-custom_minimum_size = Vector2(96, 44)
+custom_minimum_size = Vector2(96, 38)
 toggle_mode = true
 layout_mode = 2
 text = "中央"
 
 [node name="PositionRight" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow"]
-custom_minimum_size = Vector2(96, 44)
+custom_minimum_size = Vector2(96, 38)
 toggle_mode = true
 layout_mode = 2
 text = "右侧"
@@ -339,7 +337,7 @@ theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
 [node name="SkillButton0" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(244, 112)
+custom_minimum_size = Vector2(244, 92)
 layout_mode = 2
 theme_override_styles/normal = ExtResource("9_skill_normal")
 theme_override_styles/hover = ExtResource("10_skill_focused")
@@ -350,7 +348,7 @@ theme_override_font_sizes/font_size = 17
 text = "技能"
 
 [node name="SkillButton1" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(244, 112)
+custom_minimum_size = Vector2(244, 92)
 layout_mode = 2
 theme_override_styles/normal = ExtResource("9_skill_normal")
 theme_override_styles/hover = ExtResource("10_skill_focused")
@@ -361,7 +359,7 @@ theme_override_font_sizes/font_size = 17
 text = "技能"
 
 [node name="SkillButton2" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(244, 112)
+custom_minimum_size = Vector2(244, 92)
 layout_mode = 2
 theme_override_styles/normal = ExtResource("9_skill_normal")
 theme_override_styles/hover = ExtResource("10_skill_focused")
@@ -372,7 +370,7 @@ theme_override_font_sizes/font_size = 17
 text = "技能"
 
 [node name="SkillButton3" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(244, 112)
+custom_minimum_size = Vector2(244, 92)
 layout_mode = 2
 theme_override_styles/normal = ExtResource("9_skill_normal")
 theme_override_styles/hover = ExtResource("10_skill_focused")
@@ -521,7 +519,7 @@ theme_override_constants/separation = 12
 [node name="DrawButton" type="Button" parent="CanvasLayer/BattleUI/ResultPanel/ResultMargin/ResultBox/ResultActions"]
 custom_minimum_size = Vector2(210, 64)
 layout_mode = 2
-text = "抽收服球"
+text = "领取收服球"
 
 [node name="CaptureButton" type="Button" parent="CanvasLayer/BattleUI/ResultPanel/ResultMargin/ResultBox/ResultActions"]
 custom_minimum_size = Vector2(210, 64)

@@ -1,0 +1,30 @@
+{
+	"captured": {},
+	"discovered": {},
+	"exploration_streak": {},
+	"habitat_capture_counts": {
+		"cave": 0,
+		"cloud": 0,
+		"grassland": 0,
+		"pond": 0,
+		"warmstone": 0,
+		"windmill": 0
+	},
+	"inventory": {
+		"cleaning_tool": 3,
+		"food": 3,
+		"healing_item": 1,
+		"star": 5
+	},
+	"last_saved_at": "2026-07-28 11:46:29",
+	"party": [],
+	"tutorial_progress": {
+		"first_care_completed": false,
+		"prototype_completed": false,
+		"starter_received": false
+	},
+	"unlocked_habitats": {
+		"grassland": true
+	},
+	"version": 2
+}

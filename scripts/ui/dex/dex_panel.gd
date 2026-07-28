@@ -12,6 +12,13 @@ const CARD_SCENE: PackedScene = preload("res://scenes/ui/components/spirit_portr
 @onready var residents_filter: Button = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters/Residents
 @onready var discovered_filter: Button = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters/Discovered
 @onready var unknown_filter: Button = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters/Unknown
+@onready var modal_shell: Control = $ModalShell
+@onready var layout: VBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout
+@onready var filters: HBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters
+@onready var dex_content: HBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent
+@onready var catalog: VBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Catalog
+@onready var detail: PanelContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Detail
+@onready var detail_layout: VBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Detail/Margin/DetailLayout
 
 var filter_mode: String = "all"
 var selected_card: Button
@@ -25,8 +32,14 @@ func _ready() -> void:
 	discovered_filter.pressed.connect(func() -> void: set_filter("discovered"))
 	unknown_filter.pressed.connect(func() -> void: set_filter("unknown"))
 	$ModalShell.close_requested.connect(GameState.close_panel)
+	DisplayManager.profile_changed.connect(_apply_display_profile)
 	_style_detail()
+	_apply_display_profile(DisplayManager.get_active_profile())
 	_refresh_cards()
+
+func _exit_tree() -> void:
+	if DisplayManager.profile_changed.is_connected(_apply_display_profile):
+		DisplayManager.profile_changed.disconnect(_apply_display_profile)
 
 func refresh() -> void:
 	if not $ModalShell.visible:
@@ -64,6 +77,7 @@ func _refresh_cards() -> void:
 		card.tooltip_text = spirit.display_name if discovered else "未发现的萌灵"
 		grid.add_child(card)
 		card.configure(spirit.display_name, texture, state, _element_label(spirit.element), _rarity_label(spirit.rarity))
+		_configure_card_layout(card)
 		card.pressed.connect(func() -> void: _select_spirit(card, spirit, discovered, resident, texture))
 		if spirit.spirit_id == selected_spirit_id or selected_card == null:
 			_select_spirit(card, spirit, discovered, resident, texture)
@@ -160,3 +174,38 @@ func _shell_style() -> StyleBoxFlat:
 	box.bg_color = Color("fff9e9")
 	box.set_corner_radius_all(20)
 	return box
+func _apply_display_profile(_profile: DeviceProfile) -> void:
+	if not is_node_ready():
+		return
+	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
+	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	modal_shell.call("set_preferred_size", Vector2(740.0, 340.0) * density if compact else Vector2(1080.0, 610.0))
+	layout.add_theme_constant_override("separation", int(round((6.0 * density) if compact else 12.0)))
+	filters.add_theme_constant_override("separation", int(round((6.0 * density) if compact else 8.0)))
+	dex_content.add_theme_constant_override("separation", int(round((10.0 * density) if compact else 20.0)))
+	catalog.custom_minimum_size = Vector2(300.0, 0.0) * density if compact else Vector2(380.0, 0.0)
+	detail.custom_minimum_size = Vector2(292.0, 0.0) * density if compact else Vector2(460.0, 0.0)
+	portrait.custom_minimum_size.y = 104.0 * density if compact else 242.0
+	name_label.add_theme_font_size_override("font_size", int(round((22.0 * density) if compact else 30.0 * DisplayManager.get_font_scale())))
+	info_label.add_theme_font_size_override("font_size", int(round((13.0 * density) if compact else 16.0 * DisplayManager.get_font_scale())))
+	progress_label.add_theme_font_size_override("font_size", int(round((13.0 * density) if compact else 16.0 * DisplayManager.get_font_scale())))
+	detail_layout.add_theme_constant_override("separation", int(round((4.0 * density) if compact else 8.0)))
+	grid.columns = 4 if compact else 3
+	grid.add_theme_constant_override("h_separation", int(round((6.0 * density) if compact else 10.0)))
+	grid.add_theme_constant_override("v_separation", int(round((6.0 * density) if compact else 10.0)))
+	for button in [all_filter, residents_filter, discovered_filter, unknown_filter]:
+		button.custom_minimum_size = Vector2(68.0, 34.0) * density if compact else Vector2(84.0, 42.0)
+		button.add_theme_font_size_override("font_size", int(round((13.0 * density) if compact else 16.0 * DisplayManager.get_font_scale())))
+	_refresh_cards()
+
+
+func _configure_card_layout(card: Button) -> void:
+	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
+	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	card.custom_minimum_size = Vector2(68.0, 98.0) * density if compact else Vector2(104.0, 140.0)
+	var card_portrait: TextureRect = card.get_node("Card/Layout/Portrait") as TextureRect
+	var card_name: Label = card.get_node("Card/Layout/Name") as Label
+	var card_status: Label = card.get_node("Card/Layout/Status") as Label
+	card_portrait.custom_minimum_size = Vector2(62.0, 56.0) * density if compact else Vector2(94.0, 92.0)
+	card_name.add_theme_font_size_override("font_size", int(round((12.0 * density) if compact else 16.0)))
+	card_status.add_theme_font_size_override("font_size", int(round((10.0 * density) if compact else 12.0)))

@@ -39,9 +39,9 @@ func set_return_scene_path(scene_path: String) -> void:
 		return_scene_path = scene_path
 
 func prepare_battle(enemy_spirit_id: String, habitat_id: String) -> bool:
-	var captured_ids: Array[String] = SaveManager.get_captured_spirit_ids()
-	if captured_ids.is_empty():
-		GameState.set_message("先邀请一只萌灵入住，再来挑战吧。")
+	var party_ids: Array[String] = SaveManager.get_party_ids()
+	if party_ids.is_empty():
+		GameState.set_message("先组建至少一只萌灵的出战队伍，再来挑战吧。")
 		return false
 	battle_state = _default_battle_state()
 	battle_result = _default_battle_result()
@@ -52,8 +52,8 @@ func prepare_battle(enemy_spirit_id: String, habitat_id: String) -> bool:
 	_cancel_action_timeout()
 	battle_state.habitat_id = habitat_id
 	battle_state.enemy_spirit_id = enemy_spirit_id
-	if GameState.selected_battle_spirit_id == "" or not SaveManager.has_captured(GameState.selected_battle_spirit_id):
-		GameState.selected_battle_spirit_id = captured_ids[0]
+	if GameState.selected_battle_spirit_id == "" or not party_ids.has(GameState.selected_battle_spirit_id):
+		GameState.selected_battle_spirit_id = party_ids[0]
 	GameState.current_panel = "battle_prep"
 	GameState.ui_state_changed.emit(GameState.current_panel)
 	battle_state_changed.emit()
@@ -73,29 +73,40 @@ func start_battle(player_spirit_id: String) -> void:
 	battle_state.player_energy = 0
 	battle_state.player_guard_turns = 0
 	battle_state.log = ["%s勇敢出战！" % player_spirit.display_name]
+	battle_state.turn_number = 0
 	pending_result = null
 	_input_consumed_this_turn = false
 	_result_finalized = false
 	_cancel_action_timeout()
-	_set_phase(BattlePhase.PLAYER_CHOOSE)
+	_begin_player_turn()
 	GameState.current_panel = "battle"
 	GameState.ui_state_changed.emit(GameState.current_panel)
-	GameState.set_message("挑战开始，选一个技能吧。")
+	GameState.set_message("挑战开始，请先选择左、中、右站位。")
 	battle_state_changed.emit()
 
-func choose_player_position(slot: String) -> void:
-	if current_phase != BattlePhase.PLAYER_CHOOSE:
-		return
+func choose_player_position(slot: String) -> bool:
+	if current_phase != BattlePhase.PLAYER_CHOOSE or _input_consumed_this_turn:
+		return false
 	if slot not in ["left", "center", "right"]:
-		return
+		return false
 	battle_state.player_position_slot = slot
+	battle_state.position_selected_this_turn = true
 	_append_log("站位调整到%s。" % {"left": "左侧", "center": "中央", "right": "右侧"}[slot])
+	GameState.set_message("站位已确定，选择一个技能吧。")
 	battle_state_changed.emit()
+	return true
+
+func is_player_position_ready() -> bool:
+	return current_phase == BattlePhase.PLAYER_CHOOSE and bool(battle_state.get("position_selected_this_turn", false)) and String(battle_state.get("player_position_slot", "")) in ["left", "center", "right"]
 
 func use_skill(skill_index: int) -> void:
 	if current_phase != BattlePhase.PLAYER_CHOOSE:
 		return
 	if _input_consumed_this_turn:
+		return
+	if not is_player_position_ready():
+		GameState.set_message("本回合请先选择左、中、右站位。")
+		battle_state_changed.emit()
 		return
 	var player_spirit: SpiritData = GameCatalog.get_spirit_by_id(String(battle_state.player_spirit_id))
 	var enemy_spirit: SpiritData = GameCatalog.get_spirit_by_id(String(battle_state.enemy_spirit_id))
@@ -126,8 +137,7 @@ func apply_player_result() -> void:
 	var enemy_spirit: SpiritData = GameCatalog.get_spirit_by_id(String(battle_state.enemy_spirit_id))
 	var pet: Dictionary = SaveManager.get_pet_state(String(battle_state.player_spirit_id))
 	if player_spirit == null or enemy_spirit == null or pet.is_empty():
-		_set_phase(BattlePhase.PLAYER_CHOOSE)
-		_input_consumed_this_turn = false
+		_begin_player_turn(false)
 		battle_state_changed.emit()
 		return
 	if result.is_heal:
@@ -149,8 +159,7 @@ func apply_enemy_result() -> void:
 		return
 	_cancel_action_timeout()
 	if pending_result == null:
-		_set_phase(BattlePhase.PLAYER_CHOOSE)
-		_input_consumed_this_turn = false
+		_begin_player_turn()
 		battle_state_changed.emit()
 		return
 	var result: BattleActionResult = pending_result
@@ -170,8 +179,7 @@ func apply_enemy_result() -> void:
 		_set_phase(BattlePhase.CHECKING_RESULT)
 		_finish_battle(false)
 		return
-	_set_phase(BattlePhase.PLAYER_CHOOSE)
-	_input_consumed_this_turn = false
+	_begin_player_turn()
 	SaveManager.save_now()
 	battle_state_changed.emit()
 
@@ -184,21 +192,34 @@ func draw_capture_ball() -> void:
 		battle_result.capture_message = "这场挑战已经试过一次收服啦。"
 		battle_state_changed.emit()
 		return
-	if bool(battle_result.capture_already_owned):
-		battle_result.capture_status = "already"
-		battle_result.capture_message = "%s已经住在小屋里啦。" % battle_result.enemy_name
+	if bool(battle_result.capture_ball_awarded) or not Dictionary(battle_result.capture_ball).is_empty():
+		battle_result.capture_message = "本场胜利奖励已经放入背包。"
 		battle_state_changed.emit()
 		return
+	_award_capture_ball()
+	battle_state_changed.emit()
+
+func _award_capture_ball() -> bool:
 	var spirit: SpiritData = GameCatalog.get_spirit_by_id(String(battle_result.enemy_spirit_id))
 	if spirit == null:
-		return
+		battle_result.capture_message = "收服球奖励结算失败，背包没有发生变化。"
+		return false
 	var ball: Dictionary = GameCatalog.roll_capture_ball()
-	battle_result.capture_status = "ready"
+	var ball_id: String = String(ball.get("id", ""))
+	if ball_id == "" or not SaveManager.add_item(ball_id, 1):
+		battle_result.capture_message = "收服球奖励写入失败，背包没有发生变化。"
+		return false
 	battle_result.capture_ball = ball
+	battle_result.capture_ball_awarded = true
 	battle_result.capture_chance = GameCatalog.battle_capture_chance(spirit, ball)
-	battle_result.capture_message = "抽到%s，收服机会大约%d%%。" % [String(ball.name), int(round(float(battle_result.capture_chance) * 100.0))]
+	if bool(battle_result.capture_already_owned):
+		battle_result.capture_status = "already"
+		battle_result.capture_message = "获得%s并放入背包；%s已经入住，无需再次收服。" % [String(ball.name), battle_result.enemy_name]
+	else:
+		battle_result.capture_status = "ready"
+		battle_result.capture_message = "获得%s并放入背包，收服机会大约%d%%。" % [String(ball.name), int(round(float(battle_result.capture_chance) * 100.0))]
 	GameState.set_message(String(battle_result.capture_message))
-	battle_state_changed.emit()
+	return true
 
 func try_capture_after_battle() -> String:
 	if battle_result.status != "won" or not bool(battle_result.capture_eligible):
@@ -217,9 +238,20 @@ func try_capture_after_battle() -> String:
 	var enemy_spirit: SpiritData = GameCatalog.get_spirit_by_id(String(battle_result.enemy_spirit_id))
 	if enemy_spirit == null:
 		return "none"
+	var selected_ball: Dictionary = Dictionary(battle_result.capture_ball)
+	var ball_id: String = String(selected_ball.get("id", ""))
+	if ball_id == "" or SaveManager.get_item_count(ball_id) <= 0:
+		battle_result.capture_message = "背包里没有这颗收服球，未进行收服。"
+		battle_state_changed.emit()
+		return "missing_ball"
+	if not SaveManager.consume_item(ball_id, 1):
+		battle_result.capture_message = "收服球不足，背包没有发生变化。"
+		battle_state_changed.emit()
+		return "missing_ball"
 	battle_result.capture_attempted = true
 	var success: bool = randf() <= float(battle_result.capture_chance)
-	if success and SaveManager.capture_spirit(enemy_spirit):
+	var habitat_id: String = String(battle_state.get("habitat_id", ""))
+	if success and SaveManager.capture_spirit(enemy_spirit, habitat_id):
 		battle_result.capture_status = "captured"
 		battle_result.capture_eligible = false
 		battle_result.capture_message = "%s愿意住进小屋啦！" % enemy_spirit.display_name
@@ -246,6 +278,14 @@ func close_battle_result() -> void:
 	GameState.clear_encounter()
 	GameState.close_panel()
 	battle_state_changed.emit()
+
+func _begin_player_turn(increment_turn: bool = true) -> void:
+	_input_consumed_this_turn = false
+	battle_state.player_position_slot = ""
+	battle_state.position_selected_this_turn = false
+	if increment_turn:
+		battle_state.turn_number = int(battle_state.get("turn_number", 0)) + 1
+	_set_phase(BattlePhase.PLAYER_CHOOSE)
 
 func _set_phase(phase: BattlePhase) -> void:
 	current_phase = phase
@@ -369,14 +409,23 @@ func _finish_battle(player_won: bool) -> void:
 	if player_won:
 		var reward: int = GameCatalog.exp_reward(int(battle_state.enemy_level), enemy_spirit.rarity)
 		var level_messages: Array[String] = _grant_battle_exp(player_spirit, player_pet, reward)
-		battle_result = {"status": "won", "player_name": player_spirit.display_name, "player_level": int(player_pet.level), "player_hp": int(player_pet.current_hp), "player_max_hp": int(GameCatalog.get_stats(player_spirit, int(player_pet.level)).hp), "enemy_name": enemy_spirit.display_name, "enemy_level": int(battle_state.enemy_level), "enemy_spirit_id": enemy_spirit.spirit_id, "exp_gained": reward, "level_messages": level_messages, "capture_eligible": not SaveManager.has_captured(enemy_spirit.spirit_id), "capture_already_owned": SaveManager.has_captured(enemy_spirit.spirit_id), "capture_status": "idle", "capture_ball": {}, "capture_chance": 0.0, "capture_attempted": false, "capture_message": "可以进行一次战后收服。", "equipment_drop": "", "message": "挑战胜利！"}
+		var care_item_id: String = "food" if randi() % 2 == 0 else "cleaning_tool"
+		var care_item_reward: String = ""
+		if SaveManager.add_item(care_item_id, 1):
+			care_item_reward = care_item_id
+		var care_item_name: String = "食物" if care_item_reward == "food" else "清洁工具" if care_item_reward == "cleaning_tool" else ""
+		var victory_message: String = "挑战胜利！"
+		if care_item_name != "":
+			victory_message += " 获得%s×1。" % care_item_name
+		battle_result = {"status": "won", "player_name": player_spirit.display_name, "player_level": int(player_pet.level), "player_hp": int(player_pet.current_hp), "player_max_hp": int(GameCatalog.get_stats(player_spirit, int(player_pet.level)).hp), "enemy_name": enemy_spirit.display_name, "enemy_level": int(battle_state.enemy_level), "enemy_spirit_id": enemy_spirit.spirit_id, "exp_gained": reward, "level_messages": level_messages, "capture_eligible": not SaveManager.has_captured(enemy_spirit.spirit_id), "capture_already_owned": SaveManager.has_captured(enemy_spirit.spirit_id), "capture_status": "idle", "capture_ball": {}, "capture_chance": 0.0, "capture_attempted": false, "capture_message": "胜利奖励正在结算。", "capture_ball_awarded": false, "equipment_drop": "", "care_item_reward": care_item_reward, "message": victory_message}
+		_award_capture_ball()
 		GameState.set_message("%s获得%d点经验。" % [player_spirit.display_name, reward])
 		SaveManager.save_now()
 		_set_phase(BattlePhase.VICTORY)
 	else:
 		player_pet.current_hp = 0
 		SaveManager.update_pet_state(player_spirit.spirit_id, player_pet, false)
-		battle_result = {"status": "lost", "player_name": player_spirit.display_name, "player_level": int(player_pet.level), "player_hp": 0, "player_max_hp": int(GameCatalog.get_stats(player_spirit, int(player_pet.level)).hp), "enemy_name": enemy_spirit.display_name, "enemy_level": int(battle_state.enemy_level), "enemy_spirit_id": enemy_spirit.spirit_id, "exp_gained": 0, "level_messages": [], "capture_eligible": false, "capture_already_owned": SaveManager.has_captured(enemy_spirit.spirit_id), "capture_status": "locked", "capture_ball": {}, "capture_chance": 0.0, "capture_attempted": false, "capture_message": "回小屋恢复一下，再来试试。", "equipment_drop": "", "message": "挑战失败。"}
+		battle_result = {"status": "lost", "player_name": player_spirit.display_name, "player_level": int(player_pet.level), "player_hp": 0, "player_max_hp": int(GameCatalog.get_stats(player_spirit, int(player_pet.level)).hp), "enemy_name": enemy_spirit.display_name, "enemy_level": int(battle_state.enemy_level), "enemy_spirit_id": enemy_spirit.spirit_id, "exp_gained": 0, "level_messages": [], "capture_eligible": false, "capture_already_owned": SaveManager.has_captured(enemy_spirit.spirit_id), "capture_status": "locked", "capture_ball": {}, "capture_chance": 0.0, "capture_attempted": false, "capture_message": "回小屋恢复一下，再来试试。", "capture_ball_awarded": false, "equipment_drop": "", "care_item_reward": "", "message": "挑战失败。"}
 		GameState.set_message("挑战失败也没关系，图鉴和入住记录都不会丢。")
 		SaveManager.save_now()
 		_set_phase(BattlePhase.DEFEAT)
@@ -408,7 +457,7 @@ func _append_log(line: String) -> void:
 	battle_state.log = log
 
 func _default_battle_state() -> Dictionary:
-	return {"status": "idle", "habitat_id": "", "player_spirit_id": "", "enemy_spirit_id": "", "player_level": 1, "enemy_level": 1, "enemy_hp": 0, "player_energy": 0, "player_guard_turns": 0, "player_position_slot": "center", "log": []}
+	return {"status": "idle", "habitat_id": "", "player_spirit_id": "", "enemy_spirit_id": "", "player_level": 1, "enemy_level": 1, "enemy_hp": 0, "player_energy": 0, "player_guard_turns": 0, "player_position_slot": "", "position_selected_this_turn": false, "turn_number": 0, "log": []}
 
 func _default_battle_result() -> Dictionary:
-	return {"status": "idle", "player_name": "", "player_level": 1, "player_hp": 0, "player_max_hp": 0, "enemy_name": "", "enemy_level": 1, "enemy_spirit_id": "", "exp_gained": 0, "level_messages": [], "capture_eligible": false, "capture_already_owned": false, "capture_status": "locked", "capture_ball": {}, "capture_chance": 0.0, "capture_attempted": false, "capture_message": "", "equipment_drop": "", "message": ""}
+	return {"status": "idle", "player_name": "", "player_level": 1, "player_hp": 0, "player_max_hp": 0, "enemy_name": "", "enemy_level": 1, "enemy_spirit_id": "", "exp_gained": 0, "level_messages": [], "capture_eligible": false, "capture_already_owned": false, "capture_status": "locked", "capture_ball": {}, "capture_ball_awarded": false, "capture_chance": 0.0, "capture_attempted": false, "capture_message": "", "equipment_drop": "", "care_item_reward": "", "message": ""}

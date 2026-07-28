@@ -1,0 +1,179 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/touch_controls.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="JoystickBase"]
+bg_color = Color(1, 0.976, 0.914, 0.78)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.545, 0.408, 0.259, 0.88)
+corner_radius_top_left = 64
+corner_radius_top_right = 64
+corner_radius_bottom_right = 64
+corner_radius_bottom_left = 64
+
+[sub_resource type="StyleBoxFlat" id="JoystickKnob"]
+bg_color = Color(0.463, 0.725, 0.278, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.306, 0.49, 0.173, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[sub_resource type="StyleBoxFlat" id="TouchNormal"]
+bg_color = Color(1, 0.976, 0.914, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545, 0.408, 0.259, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="TouchHover"]
+bg_color = Color(0.902, 0.957, 0.741, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.463, 0.725, 0.278, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="TouchPressed"]
+bg_color = Color(0.776, 0.886, 0.549, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.306, 0.49, 0.173, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="TouchControls" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+z_index = 80
+script = ExtResource("1_script")
+
+[node name="Joystick" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 72.0
+offset_top = -152.0
+offset_right = 188.0
+offset_bottom = -36.0
+grow_vertical = 0
+mouse_filter = 0
+theme_override_styles/panel = SubResource("JoystickBase")
+
+[node name="Knob" type="PanelContainer" parent="Joystick"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 0
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 84.0
+offset_bottom = 84.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("JoystickKnob")
+
+[node name="InteractButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -156.0
+offset_top = -142.0
+offset_right = -68.0
+offset_bottom = -54.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.286, 0.227, 0.165, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("TouchNormal")
+theme_override_styles/hover = SubResource("TouchHover")
+theme_override_styles/pressed = SubResource("TouchPressed")
+text = "互动"
+
+[node name="ConfirmButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -244.0
+offset_top = -108.0
+offset_right = -172.0
+offset_bottom = -54.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.286, 0.227, 0.165, 1)
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("TouchNormal")
+theme_override_styles/hover = SubResource("TouchHover")
+theme_override_styles/pressed = SubResource("TouchPressed")
+text = "确认"
+
+[node name="BackButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -326.0
+offset_top = -108.0
+offset_right = -254.0
+offset_bottom = -54.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.286, 0.227, 0.165, 1)
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("TouchNormal")
+theme_override_styles/hover = SubResource("TouchHover")
+theme_override_styles/pressed = SubResource("TouchPressed")
+text = "返回"
+
+[node name="MenuButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -314.0
+offset_top = 34.0
+offset_right = -250.0
+offset_bottom = 88.0
+grow_horizontal = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.286, 0.227, 0.165, 1)
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("TouchNormal")
+theme_override_styles/hover = SubResource("TouchHover")
+theme_override_styles/pressed = SubResource("TouchPressed")
+text = "菜单"

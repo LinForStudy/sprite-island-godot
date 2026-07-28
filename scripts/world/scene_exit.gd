@@ -7,6 +7,8 @@ extends Area2D
 @export var target_spawn_id: String = "entry_default"
 @export var current_exit_id: String = ""
 @export var display_name: String = "前往下一张地图"
+@export var required_habitat_id: String = ""
+@export_multiline var locked_message: String = "这条路暂时还没有开放。"
 
 @onready var name_label: Label = $NameLabel
 
@@ -30,6 +32,12 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if target_scene_path == "":
 		push_warning("SceneExit is missing target_scene_path.")
+		return
+	if required_habitat_id != "" and not SaveManager.is_habitat_unlocked(required_habitat_id):
+		GameState.set_message(locked_message)
+		if name_label != null:
+			name_label.text = locked_message
+			name_label.visible = true
 		return
 
 	transition_locked = true

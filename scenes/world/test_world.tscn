@@ -5,7 +5,7 @@
 [ext_resource type="TileSet" path="res://tilesets/wind_plaza_tiles.tres" id="2_wind_plaza"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialogue_ui.tscn" id="4_dialogue"]
-[ext_resource type="PackedScene" path="res://scenes/world/test_npc.tscn" id="5_npc"]
+[ext_resource type="PackedScene" path="res://scenes/world/starter_guide.tscn" id="5_npc"]
 [ext_resource type="PackedScene" path="res://scenes/world/scene_exit.tscn" id="6_exit"]
 [ext_resource type="PackedScene" path="res://scenes/world/home_entry.tscn" id="7_home"]
 [ext_resource type="Script" path="res://scripts/camera/camera_controller.gd" id="8_camera"]
@@ -96,10 +96,11 @@ position_smoothing_speed = 8.0
 
 [node name="GameplayUI" parent="." instance=ExtResource("9_gameplay")]
 
-[node name="GuideNpc" parent="YSortEntities" instance=ExtResource("5_npc")]
+[node name="StarterGuide" parent="YSortEntities" instance=ExtResource("5_npc")]
 position = Vector2(672, 496)
-speaker_name = "小岛守望员"
-dialogue_text = "这里是迎风广场。顺着三条支路去草丛、池塘和暖石看看；右下角的路能通往林间入口。"
+speaker_name = "迎风向导"
+first_dialogue_text = "这是叶团团，它愿意成为你的第一位伙伴！我也把初始物资放进背包了。先去草丛完成第一次野外收服吧。"
+repeat_dialogue_text = "叶团团已经加入你的队伍。草丛首次野外收服会开放池塘，继续探索就能前往更远的林间入口。"
 
 [node name="HomeEntry" parent="." instance=ExtResource("7_home")]
 position = Vector2(360, 728)
@@ -110,6 +111,8 @@ target_scene_path = "res://scenes/world/grove_gate.tscn"
 target_spawn_id = "entry_from_south"
 current_exit_id = "north_path"
 display_name = "前往林间入口"
+required_habitat_id = "windmill"
+locked_message = "完成草丛、池塘和暖石的首次野外收服后，林间入口才会开放。"
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 

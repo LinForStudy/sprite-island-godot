@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/gameplay_ui.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dex/dex_panel.tscn" id="9_dex_page"]
@@ -18,6 +18,8 @@
 [ext_resource type="StyleBox" path="res://resources/themes/ui2/world_action_disabled.tres" id="18_action_disabled"]
 [ext_resource type="StyleBox" path="res://resources/themes/ui2/interaction_prompt_panel.tres" id="16_prompt_style"]
 [ext_resource type="StyleBox" path="res://resources/themes/ui2/input_badge.tres" id="17_input_badge"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/game_modal_shell.tscn" id="19_modal_shell"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/touch_controls.tscn" id="20_touch_controls"]
 
 [node name="GameplayUI" type="CanvasLayer"]
 script = ExtResource("1_script")
@@ -323,17 +325,7 @@ text = "迎风广场"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Root"]
 
-[node name="SecondaryModalDimmer" type="Button" parent="Root"]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 0
-flat = true
-modulate = Color(0, 0, 0, 0.4)
+[node name="TouchControls" parent="Root" instance=ExtResource("20_touch_controls")]
 
 [node name="HabitatPanel" type="PanelContainer" parent="Root"]
 visible = false
@@ -493,140 +485,6 @@ text = "发起挑战"
 custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 text = "离开"
-[node name="DexPanel" type="PanelContainer" parent="Root"]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -460.0
-offset_top = -275.0
-offset_right = 460.0
-offset_bottom = 275.0
-
-[node name="DexMargin" type="MarginContainer" parent="Root/DexPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 22
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 22
-
-[node name="DexBox" type="VBoxContainer" parent="Root/DexPanel/DexMargin"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="DexHeader" type="Label" parent="Root/DexPanel/DexMargin/DexBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "萌灵图鉴"
-
-[node name="DexSplit" type="HBoxContainer" parent="Root/DexPanel/DexMargin/DexBox"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="DexList" type="ItemList" parent="Root/DexPanel/DexMargin/DexBox/DexSplit"]
-custom_minimum_size = Vector2(320, 340)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="DexDetail" type="Label" parent="Root/DexPanel/DexMargin/DexBox/DexSplit"]
-custom_minimum_size = Vector2(520, 340)
-layout_mode = 2
-size_flags_horizontal = 3
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 20
-text = "详情"
-
-[node name="DexBackButton" type="Button" parent="Root/DexPanel/DexMargin/DexBox"]
-custom_minimum_size = Vector2(160, 64)
-layout_mode = 2
-text = "返回地图"
-
-[node name="HomePanel" type="PanelContainer" parent="Root"]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -470.0
-offset_top = -280.0
-offset_right = 470.0
-offset_bottom = 280.0
-
-[node name="HomeMargin" type="MarginContainer" parent="Root/HomePanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 22
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 22
-
-[node name="HomeBox" type="VBoxContainer" parent="Root/HomePanel/HomeMargin"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="HomeHeader" type="Label" parent="Root/HomePanel/HomeMargin/HomeBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "萌灵小屋"
-
-[node name="HomeSplit" type="HBoxContainer" parent="Root/HomePanel/HomeMargin/HomeBox"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="HomeList" type="ItemList" parent="Root/HomePanel/HomeMargin/HomeBox/HomeSplit"]
-custom_minimum_size = Vector2(320, 332)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="HomeDetail" type="Label" parent="Root/HomePanel/HomeMargin/HomeBox/HomeSplit"]
-custom_minimum_size = Vector2(540, 332)
-layout_mode = 2
-size_flags_horizontal = 3
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 20
-text = "详情"
-
-[node name="HomeActions" type="HBoxContainer" parent="Root/HomePanel/HomeMargin/HomeBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="HomeFeedButton" type="Button" parent="Root/HomePanel/HomeMargin/HomeBox/HomeActions"]
-custom_minimum_size = Vector2(132, 60)
-layout_mode = 2
-icon = ExtResource("5_action_feed")
-icon_max_width = 32
-text = "喂食"
-
-[node name="HomeCleanButton" type="Button" parent="Root/HomePanel/HomeMargin/HomeBox/HomeActions"]
-custom_minimum_size = Vector2(132, 60)
-layout_mode = 2
-icon = ExtResource("6_action_clean")
-icon_max_width = 32
-text = "清洁"
-
-[node name="HomePetButton" type="Button" parent="Root/HomePanel/HomeMargin/HomeBox/HomeActions"]
-custom_minimum_size = Vector2(132, 60)
-layout_mode = 2
-icon = ExtResource("7_action_interact")
-icon_max_width = 32
-text = "摸摸"
-
-[node name="HomeRestoreButton" type="Button" parent="Root/HomePanel/HomeMargin/HomeBox/HomeActions"]
-custom_minimum_size = Vector2(168, 60)
-layout_mode = 2
-icon = ExtResource("8_action_rest")
-icon_max_width = 32
-text = "恢复全部"
-
-[node name="HomeBackButton" type="Button" parent="Root/HomePanel/HomeMargin/HomeBox"]
-custom_minimum_size = Vector2(160, 64)
-layout_mode = 2
-text = "返回地图"
-
 [node name="BattlePrepPanel" type="PanelContainer" parent="Root"]
 visible = false
 layout_mode = 1
@@ -719,3 +577,195 @@ visible = false
 
 [node name="HomePage" parent="Root" instance=ExtResource("10_home_page")]
 visible = false
+
+[node name="MainMenu" parent="Root" instance=ExtResource("19_modal_shell")]
+visible = false
+z_index = 200
+title = "主菜单"
+
+[node name="ModalPanel" parent="Root/MainMenu/ModalCenter"]
+custom_minimum_size = Vector2(760, 500)
+
+[node name="MenuLayout" type="VBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="Tabs" type="HBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PartyTab" type="Button" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/Tabs"]
+custom_minimum_size = Vector2(132, 48)
+layout_mode = 2
+text = "队伍"
+
+[node name="InventoryTab" type="Button" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/Tabs"]
+custom_minimum_size = Vector2(132, 48)
+layout_mode = 2
+text = "背包"
+
+[node name="SettingsTab" type="Button" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/Tabs"]
+custom_minimum_size = Vector2(132, 48)
+layout_mode = 2
+text = "设置"
+
+[node name="PageHost" type="Control" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout"]
+custom_minimum_size = Vector2(0, 290)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PartyPage" type="VBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/PartyPage"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "当前出战队伍"
+
+[node name="Hint" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/PartyPage"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.459, 0.396, 0.325, 1)
+text = "最多 3 只萌灵；这里只读展示当前存档内容。"
+
+[node name="PartyList" type="VBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/PartyPage"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="InventoryPage" type="VBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/InventoryPage"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "背包物资"
+
+[node name="Hint" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/InventoryPage"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.459, 0.396, 0.325, 1)
+text = "使用道具仍由对应玩法页面执行；关闭菜单不会写入存档。"
+
+[node name="InventoryList" type="VBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/InventoryPage"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="SettingsPage" type="VBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="MasterRow" type="HBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/MasterRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "主音量"
+vertical_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/MasterRow"]
+custom_minimum_size = Vector2(380, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 0.85
+
+[node name="Value" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/MasterRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "85%"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MusicRow" type="HBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/MusicRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "音乐"
+vertical_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/MusicRow"]
+custom_minimum_size = Vector2(380, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 0.72
+
+[node name="Value" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/MusicRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "72%"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SfxRow" type="HBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/SfxRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "音效"
+vertical_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/SfxRow"]
+custom_minimum_size = Vector2(380, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 0.82
+
+[node name="Value" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage/SfxRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "82%"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="FullscreenCheck" type="CheckButton" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "全屏显示"
+
+[node name="Footer" type="HBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout"]
+layout_mode = 2
+
+[node name="Hint" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.459, 0.396, 0.325, 1)
+text = "Esc / 返回：回到世界"
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/Footer"]
+custom_minimum_size = Vector2(132, 48)
+layout_mode = 2
+text = "返回世界"

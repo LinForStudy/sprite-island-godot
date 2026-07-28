@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/TestNpc.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/world/npc_keeper.png" id="2_texture"]
+[ext_resource type="Texture2D" path="res://assets/npc/starter_guide/generated_v2/processed/guide-1.png" id="2_texture"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansSC-VF.ttf" id="3_font"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
@@ -20,8 +20,8 @@ color = Color(0.18, 0.22, 0.1, 0.26)
 z_index = -1
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_texture")
-position = Vector2(0, -8)
-scale = Vector2(1.05, 1.05)
+position = Vector2(0, -20)
+scale = Vector2(0.46, 0.46)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_npc")

@@ -4,7 +4,7 @@ const FIELD_SCENES: Dictionary = {
 	"grassland": "res://scenes/battle/fields/battlefield_grassland.tscn",
 	"pond": "res://scenes/battle/fields/battlefield_pond.tscn",
 	"warmstone": "res://scenes/battle/fields/battlefield_warmstone.tscn",
-	"forest": "res://scenes/battle/fields/battlefield_forest.tscn",
+	"windmill": "res://scenes/battle/fields/battlefield_windmill.tscn",
 	"cave": "res://scenes/battle/fields/battlefield_cave.tscn",
 	"cloud": "res://scenes/battle/fields/battlefield_cloud.tscn"
 }
@@ -18,7 +18,7 @@ const SPIRIT_TEXTURES: Dictionary = {
 	"moonfish": "res://assets/spirits/06_yue_qiyu_月鳍鱼.png",
 	"rainseal": "res://assets/spirits/07_yu_ling_haibao_雨铃海豹.png",
 	"starjelly": "res://assets/spirits/08_xing_mian_shuimu_星眠水母.png",
-	"emberfox": "res://assets/spirits/battle_placeholders/09_nuan_weihu_clean_placeholder.png",
+	"emberfox": "res://assets/spirits/emberfox_clean/processed/emberfox-1.png",
 	"lanterncub": "res://assets/spirits/10_deng_rongxiong_灯绒熊.png",
 	"candlemoth": "res://assets/spirits/11_zhu_chie_烛翅蛾.png",
 	"sunlion": "res://assets/spirits/12_ri_mianshi_日冕狮.png",
@@ -46,7 +46,7 @@ const ELEMENT_COLORS: Dictionary = {
 }
 
 const BASE_VIEW_SIZE: Vector2 = Vector2(1280.0, 720.0)
-const COMMAND_PANEL_HEIGHT: float = 205.0
+const COMMAND_PANEL_HEIGHT: float = 260.0
 const STATUS_NORMAL_STYLE: StyleBox = preload("res://resources/themes/battle/battle_status_normal.tres")
 const STATUS_ACTIVE_STYLE: StyleBox = preload("res://resources/themes/battle/battle_status_active.tres")
 const SKILL_SELECTED_STYLE: StyleBox = preload("res://resources/themes/battle/battle_skill_selected.tres")
@@ -112,6 +112,7 @@ var _current_selected_skill: SpiritSkill
 var _selected_skill_index: int = -1
 var _exiting: bool = false
 var _loaded_habitat_id: String = ""
+var _active_field: Battlefield = null
 var _last_intro_enemy_id: String = ""
 var _toast_tween: Tween = null
 
@@ -164,17 +165,29 @@ func _load_battlefield() -> void:
 	var habitat_id: String = String(BattleManager.battle_state.get("habitat_id", "grassland"))
 	if habitat_id == "":
 		habitat_id = "grassland"
-	if habitat_id == _loaded_habitat_id and field_mount.get_child_count() > 0:
+	if habitat_id == _loaded_habitat_id and is_instance_valid(_active_field):
 		return
 	for child in field_mount.get_children():
+		field_mount.remove_child(child)
 		child.queue_free()
-	var field_path: String = String(FIELD_SCENES.get(habitat_id, FIELD_SCENES["grassland"]))
+	_active_field = null
+	if not FIELD_SCENES.has(habitat_id):
+		push_error("未配置独立战场：%s" % habitat_id)
+		habitat_id = "grassland"
+	var field_path: String = String(FIELD_SCENES[habitat_id])
 	var packed_field: PackedScene = load(field_path) as PackedScene
 	if packed_field == null:
-		packed_field = load(FIELD_SCENES["grassland"]) as PackedScene
-	if packed_field != null:
-		var field: Node = packed_field.instantiate()
-		field_mount.add_child(field)
+		push_error("战场场景加载失败：%s" % field_path)
+		return
+	var field: Node = packed_field.instantiate()
+	field_mount.add_child(field)
+	_active_field = field as Battlefield
+	if _active_field == null:
+		push_error("战场根节点必须使用 Battlefield：%s" % field_path)
+	else:
+		var issues: PackedStringArray = _active_field.validate_contract(habitat_id)
+		if not issues.is_empty():
+			push_error("战场契约错误 %s：%s" % [field_path, "；".join(issues)])
 	_loaded_habitat_id = habitat_id
 
 func _apply_world_layout() -> void:
@@ -183,10 +196,18 @@ func _apply_world_layout() -> void:
 		view_size = BASE_VIEW_SIZE
 	camera.position = view_size * 0.5
 	battle_world.position = Vector2.ZERO
+	var field_scale: Vector2 = Vector2(view_size.x / BASE_VIEW_SIZE.x, view_size.y / BASE_VIEW_SIZE.y)
+	field_mount.scale = field_scale
 	var slot: String = String(BattleManager.battle_state.get("player_position_slot", "center"))
-	var slot_offset: float = {"left": -96.0, "center": 0.0, "right": 96.0}.get(slot, 0.0)
-	player_spirit.set_home_position(Vector2(view_size.x * PLAYER_HOME_RATIO.x + slot_offset, view_size.y - COMMAND_PANEL_HEIGHT - 58.0))
-	enemy_spirit.set_home_position(Vector2(view_size.x * ENEMY_HOME_RATIO.x, view_size.y * ENEMY_HOME_RATIO.y))
+	if slot not in ["left", "center", "right"]:
+		slot = "center"
+	if is_instance_valid(_active_field):
+		player_spirit.set_home_position(_active_field.get_player_spawn(slot) * field_scale)
+		enemy_spirit.set_home_position(_active_field.get_enemy_spawn() * field_scale)
+	else:
+		var slot_offset: float = {"left": -96.0, "center": 0.0, "right": 96.0}.get(slot, 0.0)
+		player_spirit.set_home_position(Vector2(view_size.x * PLAYER_HOME_RATIO.x + slot_offset, view_size.y - COMMAND_PANEL_HEIGHT - 58.0))
+		enemy_spirit.set_home_position(Vector2(view_size.x * ENEMY_HOME_RATIO.x, view_size.y * ENEMY_HOME_RATIO.y))
 
 func _refresh() -> void:
 	_load_battlefield()
@@ -240,10 +261,10 @@ func _refresh() -> void:
 
 func _refresh_battle_info(player_data: SpiritData, enemy_data: SpiritData) -> void:
 	turn_tip.visible = BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE or BattleManager.current_phase == BattleManager.BattlePhase.RESOLVING_ENEMY
-	turn_tip_text.text = "玩家回合" if BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE else "芽角鹿回合"
+	turn_tip_text.text = "玩家回合" if BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE else "%s回合" % enemy_data.display_name
 	match BattleManager.current_phase:
 		BattleManager.BattlePhase.PLAYER_CHOOSE:
-			round_hint.text = "选一个技能吧"
+			round_hint.text = "选择左 / 中 / 右站位" if not BattleManager.is_player_position_ready() else "站位已确定，选择技能"
 		BattleManager.BattlePhase.RESOLVING_PLAYER:
 			round_hint.text = "你的萌灵正在行动..."
 		BattleManager.BattlePhase.RESOLVING_ENEMY:
@@ -372,7 +393,8 @@ func _refresh_status_card_styles() -> void:
 
 func _refresh_skill_buttons(player_data: SpiritData) -> void:
 	var can_act: bool = BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE
-	var selected_slot: String = String(BattleManager.battle_state.get("player_position_slot", "center"))
+	var position_ready: bool = BattleManager.is_player_position_ready()
+	var selected_slot: String = String(BattleManager.battle_state.get("player_position_slot", ""))
 	for index in range(position_buttons.size()):
 		var slot: String = ["left", "center", "right"][index]
 		position_buttons[index].disabled = not can_act
@@ -392,7 +414,7 @@ func _refresh_skill_buttons(player_data: SpiritData) -> void:
 			else:
 				button.text = "%s\n%s" % [display_name, subtitle]
 			var is_ultimate_locked: bool = skill.skill_role == "ultimate" and int(BattleManager.battle_state.player_energy) < 100
-			button.disabled = not can_act or is_ultimate_locked
+			button.disabled = not can_act or not position_ready or is_ultimate_locked
 		else:
 			button.visible = false
 
@@ -407,7 +429,9 @@ func _refresh_result_panel() -> void:
 	if not Array(BattleManager.battle_result.level_messages).is_empty():
 		result_summary.text += "\n" + "\n".join(PackedStringArray(BattleManager.battle_result.level_messages))
 	capture_label.text = String(BattleManager.battle_result.capture_message)
-	draw_button.disabled = BattleManager.battle_result.status != "won" or bool(BattleManager.battle_result.capture_attempted) or bool(BattleManager.battle_result.capture_already_owned)
+	var ball_awarded: bool = bool(BattleManager.battle_result.capture_ball_awarded)
+	draw_button.text = "已获得收服球" if ball_awarded else "重试奖励结算"
+	draw_button.disabled = BattleManager.battle_result.status != "won" or bool(BattleManager.battle_result.capture_attempted) or ball_awarded or not Dictionary(BattleManager.battle_result.capture_ball).is_empty()
 	capture_button.disabled = BattleManager.battle_result.status != "won" or bool(BattleManager.battle_result.capture_attempted) or bool(BattleManager.battle_result.capture_already_owned) or Dictionary(BattleManager.battle_result.capture_ball).is_empty()
 
 func _return_to_map() -> void:
@@ -465,8 +489,11 @@ func _apply_display_profile(profile: DeviceProfile) -> void:
 	var ui_scale: float = profile.ui_scale if profile != null else 1.0
 	var font_scale: float = profile.font_scale if profile != null else 1.0
 	for button in skill_buttons:
-		button.custom_minimum_size = Vector2(194, 112) * ui_scale
+		button.custom_minimum_size = Vector2(194, 92) * ui_scale
 		button.add_theme_font_size_override("font_size", int(round(17 * font_scale)))
+	for button in position_buttons:
+		button.custom_minimum_size = Vector2(96, 38) * ui_scale
+		button.add_theme_font_size_override("font_size", int(round(15 * font_scale)))
 	player_name_label.add_theme_font_size_override("font_size", int(round(20 * font_scale)))
 	player_level_label.add_theme_font_size_override("font_size", int(round(18 * font_scale)))
 	player_element_icon.add_theme_font_size_override("font_size", int(round(16 * font_scale)))

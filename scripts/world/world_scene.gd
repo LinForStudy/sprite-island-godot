@@ -32,6 +32,20 @@ const TILE_SOIL := Vector2i(0, 3)
 const TILE_SIGN := Vector2i(1, 3)
 const TILE_BUSH := Vector2i(2, 3)
 const HABITAT_POINT_SCENE := preload("res://scenes/world/habitat_point.tscn")
+const WORLD_VISUAL_LAYOUTS_PATH := "res://data/maps/world_visual_layouts.json"
+const VISUAL_SOURCE_BY_NAME: Dictionary = {
+	"grass_1": VISUAL_SOURCE_GRASS_1,
+	"grass_2": VISUAL_SOURCE_GRASS_2,
+	"grass_3": VISUAL_SOURCE_GRASS_3,
+	"plaza": VISUAL_SOURCE_PLAZA,
+	"road": VISUAL_SOURCE_ROAD,
+	"grassland_1": VISUAL_SOURCE_GRASSLAND_1,
+	"grassland_2": VISUAL_SOURCE_GRASSLAND_2,
+	"tall_grass": VISUAL_SOURCE_TALL_GRASS,
+	"grass_edge": VISUAL_SOURCE_GRASS_EDGE,
+	"water": VISUAL_SOURCE_WATER,
+	"warm_soil": VISUAL_SOURCE_WARM_SOIL
+}
 
 @export var scene_id: String = ""
 @export var map_preset: String = "test_world"
@@ -58,6 +72,9 @@ var interaction_prompt_candidates: Array[Area2D] = []
 
 func _ready() -> void:
 	WorldState.register_scene(scene_id)
+	var audio_manager: Node = get_node_or_null("/root/AudioManager")
+	if audio_manager != null:
+		audio_manager.call("play_world_music", scene_id)
 	_build_map()
 	_build_visual_blockers()
 	_hide_helper_layers()
@@ -102,20 +119,30 @@ func _clear_layers() -> void:
 		child.queue_free()
 
 func _build_visual_blockers() -> void:
-	# Visible props are separate from the placeholder TileMap collision layer.
-	# These coarse base shapes make trees, rocks, the pond and fenced yard read as route boundaries.
-	_add_visual_blocker(Vector2(500, 402), Vector2(42, 24), "PlazaTreeWestBlocker")
-	_add_visual_blocker(Vector2(1020, 416), Vector2(42, 24), "PlazaTreeEastBlocker")
-	_add_visual_blocker(Vector2(356, 652), Vector2(38, 22), "PondTreeBlocker")
-	_add_visual_blocker(Vector2(1326, 142), Vector2(40, 24), "WarmTreeBlocker")
-	_add_visual_blocker(Vector2(210, 676), Vector2(38, 22), "HomeTreeBlocker")
-	_add_visual_blocker(Vector2(590, 476), Vector2(34, 20), "PlazaStoneWestBlocker")
-	_add_visual_blocker(Vector2(1080, 486), Vector2(32, 20), "PlazaStoneEastBlocker")
-	_add_visual_blocker(Vector2(1168, 278), Vector2(56, 38), "WarmStoneMainBlocker")
-	_add_visual_blocker(Vector2(1260, 234), Vector2(42, 30), "WarmStoneSideBlocker")
-	_add_visual_blocker(Vector2(238, 586), Vector2(140, 82), "PondWaterBlocker")
-	_add_visual_blocker(Vector2(268, 730), Vector2(70, 12), "HomeFenceWestBlocker")
-	_add_visual_blocker(Vector2(452, 730), Vector2(70, 12), "HomeFenceEastBlocker")
+	# Runtime collision stays separate from the visual TileMap and prop scenes.
+	match map_preset:
+		"grove_gate":
+			_add_visual_blocker(Vector2(176, 162), Vector2(42, 24), "GroveTreeNorthWest")
+			_add_visual_blocker(Vector2(520, 132), Vector2(46, 26), "GroveTreeNorthCenter")
+			_add_visual_blocker(Vector2(1370, 140), Vector2(42, 24), "GroveTreeNorthEast")
+			_add_visual_blocker(Vector2(126, 504), Vector2(42, 24), "GroveTreeWest")
+			_add_visual_blocker(Vector2(1402, 482), Vector2(44, 26), "GroveTreeEast")
+			_add_visual_blocker(Vector2(238, 790), Vector2(40, 22), "GroveTreeSouthWest")
+			_add_visual_blocker(Vector2(1308, 772), Vector2(40, 22), "GroveTreeSouthEast")
+			_add_visual_blocker(Vector2(268, 262), Vector2(86, 54), "CaveRockBlocker")
+		_:
+			_add_visual_blocker(Vector2(500, 402), Vector2(42, 24), "PlazaTreeWestBlocker")
+			_add_visual_blocker(Vector2(1020, 416), Vector2(42, 24), "PlazaTreeEastBlocker")
+			_add_visual_blocker(Vector2(356, 652), Vector2(38, 22), "PondTreeBlocker")
+			_add_visual_blocker(Vector2(1326, 142), Vector2(40, 24), "WarmTreeBlocker")
+			_add_visual_blocker(Vector2(210, 676), Vector2(38, 22), "HomeTreeBlocker")
+			_add_visual_blocker(Vector2(590, 476), Vector2(34, 20), "PlazaStoneWestBlocker")
+			_add_visual_blocker(Vector2(1080, 486), Vector2(32, 20), "PlazaStoneEastBlocker")
+			_add_visual_blocker(Vector2(1168, 278), Vector2(56, 38), "WarmStoneMainBlocker")
+			_add_visual_blocker(Vector2(1260, 234), Vector2(42, 30), "WarmStoneSideBlocker")
+			_add_visual_blocker(Vector2(238, 586), Vector2(140, 82), "PondWaterBlocker")
+			_add_visual_blocker(Vector2(268, 730), Vector2(70, 12), "HomeFenceWestBlocker")
+			_add_visual_blocker(Vector2(452, 730), Vector2(70, 12), "HomeFenceEastBlocker")
 
 func _add_visual_blocker(center: Vector2, size: Vector2, blocker_name: String) -> void:
 	var body: StaticBody2D = StaticBody2D.new()
@@ -239,82 +266,59 @@ func _build_test_world() -> void:
 	_build_border_colliders()
 
 func _build_wind_plaza_visual_ground() -> void:
-	if visual_ground_layer == null:
+	_build_visual_layout("test_world")
+
+
+func _build_visual_layout(layout_id: String) -> void:
+	if visual_ground_layer == null or visual_path_layer == null or visual_detail_layer == null:
 		return
-	# One calm grass family is the map foundation. Variants stay isolated so
-	# the terrain reads as natural detail instead of rectangular zones.
-	for x in range(24):
-		for y in range(14):
-			_set_visual_ground_tile(Vector2i(x, y), VISUAL_SOURCE_GRASS_1)
-	for cell in [
-		Vector2i(1, 1), Vector2i(4, 8), Vector2i(8, 1), Vector2i(14, 2),
-		Vector2i(18, 6), Vector2i(22, 3), Vector2i(2, 12), Vector2i(16, 12)
-	]:
-		_set_visual_ground_tile(cell, VISUAL_SOURCE_GRASS_2)
+	var layouts: Dictionary = _read_world_visual_layouts()
+	var layout: Dictionary = Dictionary(layouts.get(layout_id, {}))
+	if layout.is_empty():
+		push_warning("Missing world visual layout: %s" % layout_id)
+		return
+	var visual_size: Array = Array(layout.get("visual_size", [24, 14]))
+	var width: int = int(visual_size[0]) if visual_size.size() > 0 else 24
+	var height: int = int(visual_size[1]) if visual_size.size() > 1 else 14
+	var ground_source: int = _visual_source_id(String(layout.get("ground_source", "grass_1")))
+	for x in range(width):
+		for y in range(height):
+			_set_visual_ground_tile(Vector2i(x, y), ground_source)
+	for variant_value in Array(layout.get("ground_variants", [])):
+		var variant: Dictionary = Dictionary(variant_value)
+		var variant_source: int = _visual_source_id(String(variant.get("source", "grass_2")))
+		for cell_value in Array(variant.get("cells", [])):
+			_set_visual_ground_tile(_vector2i_from_array(Array(cell_value)), variant_source)
+	for rect_value in Array(layout.get("rects", [])):
+		var rect_entry: Dictionary = Dictionary(rect_value)
+		var rect_values: Array = Array(rect_entry.get("rect", []))
+		if rect_values.size() < 4:
+			continue
+		var rect: Rect2i = Rect2i(int(rect_values[0]), int(rect_values[1]), int(rect_values[2]), int(rect_values[3]))
+		_fill_visual_rect(rect, _visual_source_id(String(rect_entry.get("source", "road"))))
+	for detail_value in Array(layout.get("details", [])):
+		var detail: Dictionary = Dictionary(detail_value)
+		var detail_source: int = _visual_source_id(String(detail.get("source", "grass_edge")))
+		for cell_value in Array(detail.get("cells", [])):
+			_set_visual_tile(_vector2i_from_array(Array(cell_value)), detail_source)
 
-	# Central activity space: a compact, readable plaza with low visual noise.
-	_fill_visual_rect(Rect2i(10, 6, 4, 3), VISUAL_SOURCE_PLAZA)
 
-	# North-west branch to the grassland habitat. Two-tile-wide stepped bends
-	# avoid the previous hard cross-road and keep a consistent walking width.
-	_fill_visual_rect(Rect2i(8, 5, 4, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(7, 4, 3, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(5, 3, 4, 2), VISUAL_SOURCE_ROAD)
+func _read_world_visual_layouts() -> Dictionary:
+	if not FileAccess.file_exists(WORLD_VISUAL_LAYOUTS_PATH):
+		return {}
+	var file: FileAccess = FileAccess.open(WORLD_VISUAL_LAYOUTS_PATH, FileAccess.READ)
+	if file == null:
+		return {}
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	return Dictionary(parsed) if typeof(parsed) == TYPE_DICTIONARY else {}
 
-	# South-west branch to the cottage yard.
-	_fill_visual_rect(Rect2i(8, 8, 4, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(7, 9, 3, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(5, 10, 4, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(4, 11, 3, 2), VISUAL_SOURCE_ROAD)
 
-	# South-east branch to the existing scene exit.
-	_fill_visual_rect(Rect2i(13, 8, 4, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(15, 9, 4, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(17, 10, 5, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(20, 11, 4, 2), VISUAL_SOURCE_ROAD)
+func _visual_source_id(source_name: String) -> int:
+	return int(VISUAL_SOURCE_BY_NAME.get(source_name, VISUAL_SOURCE_GRASS_1))
 
-	# Sparse transition tiles soften only selected outside bends. They avoid a
-	# continuous dark outline while breaking the remaining hard tile corners.
-	for cell in [
-		Vector2i(7, 6), Vector2i(6, 5), Vector2i(4, 4), Vector2i(9, 3),
-		Vector2i(9, 10), Vector2i(6, 9), Vector2i(4, 10), Vector2i(3, 11), Vector2i(7, 12),
-		Vector2i(14, 10), Vector2i(16, 11), Vector2i(19, 12), Vector2i(22, 10), Vector2i(23, 13)
-	]:
-		_set_visual_tile(cell, VISUAL_SOURCE_GRASS_EDGE)
 
-	_build_grassland_visual_ground()
-	_build_pond_visual_ground()
-	_build_warmstone_visual_ground()
-
-func _build_grassland_visual_ground() -> void:
-	# Deep grass is restricted to the habitat and forest edge. The irregular
-	# footprint replaces the old horizontal bands that cut across the screen.
-	for cell in [
-		Vector2i(3, 2), Vector2i(4, 2), Vector2i(5, 2), Vector2i(6, 2),
-		Vector2i(2, 3), Vector2i(3, 3), Vector2i(4, 3), Vector2i(6, 3),
-		Vector2i(2, 4), Vector2i(3, 4), Vector2i(4, 4),
-		Vector2i(3, 5), Vector2i(4, 5)
-	]:
-		_set_visual_tile(cell, VISUAL_SOURCE_GRASSLAND_1)
-	for cell in [Vector2i(3, 3), Vector2i(4, 3), Vector2i(3, 4), Vector2i(4, 4)]:
-		_set_visual_tile(cell, VISUAL_SOURCE_TALL_GRASS)
-	for cell in [Vector2i(5, 2), Vector2i(5, 3), Vector2i(4, 5)]:
-		_set_visual_tile(cell, VISUAL_SOURCE_GRASS_EDGE)
-func _build_pond_visual_ground() -> void:
-	for cell in [
-		Vector2i(2, 8), Vector2i(3, 8), Vector2i(4, 8), Vector2i(5, 8),
-		Vector2i(2, 9), Vector2i(3, 9), Vector2i(4, 9), Vector2i(5, 9),
-		Vector2i(3, 10), Vector2i(4, 10)
-	]:
-		_set_visual_tile(cell, VISUAL_SOURCE_WATER)
-
-func _build_warmstone_visual_ground() -> void:
-	for cell in [
-		Vector2i(17, 3), Vector2i(18, 3), Vector2i(19, 3),
-		Vector2i(17, 4), Vector2i(18, 4), Vector2i(19, 4), Vector2i(20, 4),
-		Vector2i(18, 5), Vector2i(19, 5), Vector2i(20, 5)
-	]:
-		_set_visual_tile(cell, VISUAL_SOURCE_WARM_SOIL)
+func _vector2i_from_array(values: Array) -> Vector2i:
+	return Vector2i(int(values[0]), int(values[1])) if values.size() >= 2 else Vector2i.ZERO
 
 func _set_visual_ground_tile(cell: Vector2i, source_id: int) -> void:
 	if visual_ground_layer == null:
@@ -335,6 +339,7 @@ func _fill_visual_rect(rect: Rect2i, source_id: int) -> void:
 
 func _build_grove_gate() -> void:
 	map_size = Vector2i(96, 54)
+	_build_grove_visual_ground()
 	_fill_rect(ground_layer, Rect2i(0, 0, map_size.x, map_size.y), TILE_GRASS)
 	_fill_rect(ground_layer, Rect2i(40, 37, 16, 7), TILE_ROAD)
 	_fill_rect(ground_layer, Rect2i(46, 0, 4, map_size.y), TILE_ROAD)
@@ -350,6 +355,10 @@ func _build_grove_gate() -> void:
 	_build_fence_column(84, 35, 7)
 	_build_tree_cluster([Vector2i(11, 24), Vector2i(18, 25), Vector2i(25, 21), Vector2i(66, 24), Vector2i(74, 27), Vector2i(85, 18), Vector2i(88, 22), Vector2i(10, 49), Vector2i(30, 48)])
 	_build_border_colliders()
+
+func _build_grove_visual_ground() -> void:
+	_build_visual_layout("grove_gate")
+
 
 func _build_house(wall_rect: Rect2i, roof_rect: Rect2i, door_cell: Vector2i) -> void:
 	for x in range(wall_rect.position.x, wall_rect.end.x):
@@ -511,6 +520,8 @@ func _interaction_prompt_text(area: Area2D) -> String:
 		return "开始探索"
 	if script_path.ends_with("home_entry.gd"):
 		return "进入小屋"
+	if script_path.ends_with("starter_guide.gd"):
+		return "与向导交谈"
 	if script_path.ends_with("TestNpc.gd"):
 		return "与村民交谈"
 	return "互动"

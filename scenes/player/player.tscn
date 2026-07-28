@@ -1,94 +1,65 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/idle_down.png" id="2_idle_down"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/walk_down.png" id="3_walk_down"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/idle_up.png" id="4_idle_up"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/walk_up.png" id="5_walk_up"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/idle_left.png" id="6_idle_left"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/walk_left.png" id="7_walk_left"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/idle_right.png" id="8_idle_right"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/player/walk_right.png" id="9_walk_right"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-1.png" id="2_frame_01"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-2.png" id="3_frame_02"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-3.png" id="4_frame_03"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-4.png" id="5_frame_04"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-5.png" id="6_frame_05"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-6.png" id="7_frame_06"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-7.png" id="8_frame_07"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-8.png" id="9_frame_08"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-9.png" id="10_frame_09"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-10.png" id="11_frame_10"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-11.png" id="12_frame_11"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-12.png" id="13_frame_12"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-13.png" id="14_frame_13"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-14.png" id="15_frame_14"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-15.png" id="16_frame_15"]
+[ext_resource type="Texture2D" path="res://assets/player/explorer/generated_v2/final/player_sheet-16.png" id="17_frame_16"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_idle_down")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("2_frame_01")}],
 "loop": true,
 "name": &"idle_down",
 "speed": 5.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("6_idle_left")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("6_frame_05")}],
 "loop": true,
 "name": &"idle_left",
 "speed": 5.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("8_idle_right")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("10_frame_09")}],
 "loop": true,
 "name": &"idle_right",
 "speed": 5.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("4_idle_up")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("14_frame_13")}],
 "loop": true,
 "name": &"idle_up",
 "speed": 5.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_idle_down")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_walk_down")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("2_frame_01")}, {"duration": 1.0, "texture": ExtResource("3_frame_02")}, {"duration": 1.0, "texture": ExtResource("4_frame_03")}, {"duration": 1.0, "texture": ExtResource("5_frame_04")}],
 "loop": true,
 "name": &"walk_down",
-"speed": 7.0
+"speed": 8.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("6_idle_left")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_walk_left")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("6_frame_05")}, {"duration": 1.0, "texture": ExtResource("7_frame_06")}, {"duration": 1.0, "texture": ExtResource("8_frame_07")}, {"duration": 1.0, "texture": ExtResource("9_frame_08")}],
 "loop": true,
 "name": &"walk_left",
-"speed": 7.0
+"speed": 8.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("8_idle_right")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_walk_right")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("10_frame_09")}, {"duration": 1.0, "texture": ExtResource("11_frame_10")}, {"duration": 1.0, "texture": ExtResource("12_frame_11")}, {"duration": 1.0, "texture": ExtResource("13_frame_12")}],
 "loop": true,
 "name": &"walk_right",
-"speed": 7.0
+"speed": 8.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("4_idle_up")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_walk_up")
-}],
+"frames": [{"duration": 1.0, "texture": ExtResource("14_frame_13")}, {"duration": 1.0, "texture": ExtResource("15_frame_14")}, {"duration": 1.0, "texture": ExtResource("16_frame_15")}, {"duration": 1.0, "texture": ExtResource("17_frame_16")}],
 "loop": true,
 "name": &"walk_up",
-"speed": 7.0
+"speed": 8.0
 }]
-
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 7.0
 height = 16.0
@@ -110,8 +81,8 @@ z_index = -1
 sprite_frames = SubResource("SpriteFrames_player")
 animation = &"idle_down"
 centered = true
-position = Vector2(0, -8)
-scale = Vector2(1.2, 1.2)
+position = Vector2(0, -13)
+scale = Vector2(0.72, 0.72)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 0)

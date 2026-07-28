@@ -90,6 +90,15 @@ const BATTLE_CAPTURE_BALLS: Array[Dictionary] = [
 ]
 const SPIRITS_DATA_PATH: String = "res://data/catalog/spirits_phase1.json"
 const HABITATS_DATA_PATH: String = "res://data/catalog/habitats_phase1.json"
+const BATTLE_FRAME_DIR: String = "res://resources/battle/spirits"
+const LEGACY_BATTLE_FRAME_DIR: String = "res://resources/battle"
+const REQUIRED_BATTLE_FRAME_COUNTS: Dictionary = {
+	"idle": 4,
+	"move": 4,
+	"attack": 4,
+	"hurt": 2,
+	"defeat": 4
+}
 
 static var _spirits: Array[SpiritData] = []
 static var _spirit_lookup: Dictionary = {}
@@ -111,6 +120,55 @@ static func get_habitats() -> Array[HabitatData]:
 static func get_habitat_by_id(habitat_id: String) -> HabitatData:
 	_ensure_data()
 	return _habitat_lookup.get(habitat_id) as HabitatData
+
+static func get_battle_frames(spirit_id: String) -> SpriteFrames:
+	for resource_path in get_battle_frame_paths(spirit_id):
+		if not ResourceLoader.exists(resource_path):
+			continue
+		var frames: SpriteFrames = load(resource_path) as SpriteFrames
+		if frames == null:
+			push_error("战斗动画资源不是 SpriteFrames：%s" % resource_path)
+		return frames
+	return null
+
+static func get_battle_frame_paths(spirit_id: String) -> PackedStringArray:
+	return PackedStringArray([
+		"%s/%s_combat_frames.tres" % [BATTLE_FRAME_DIR, spirit_id],
+		"%s/%s_combat_frames.tres" % [LEGACY_BATTLE_FRAME_DIR, spirit_id]
+	])
+
+static func get_battle_frame_issues(spirit_id: String) -> PackedStringArray:
+	var issues: PackedStringArray = PackedStringArray()
+	if get_spirit_by_id(spirit_id) == null:
+		issues.append("未知萌灵 ID：%s" % spirit_id)
+		return issues
+	var frames: SpriteFrames = get_battle_frames(spirit_id)
+	if frames == null:
+		issues.append("缺少 SpriteFrames：%s" % get_battle_frame_paths(spirit_id)[0])
+		return issues
+	for action in REQUIRED_BATTLE_FRAME_COUNTS:
+		var animation_name: StringName = StringName(action)
+		if action == "defeat" and not frames.has_animation(animation_name) and frames.has_animation(&"exit"):
+			animation_name = &"exit"
+		if not frames.has_animation(animation_name):
+			issues.append("%s 缺少动作 %s" % [spirit_id, action])
+			continue
+		var expected_count: int = int(REQUIRED_BATTLE_FRAME_COUNTS[action])
+		var actual_count: int = frames.get_frame_count(animation_name)
+		if actual_count != expected_count:
+			issues.append("%s/%s 帧数应为 %d，当前为 %d" % [spirit_id, action, expected_count, actual_count])
+		for frame_index in range(actual_count):
+			if frames.get_frame_texture(animation_name, frame_index) == null:
+				issues.append("%s/%s 第 %d 帧纹理为空" % [spirit_id, action, frame_index])
+	return issues
+
+static func validate_battle_frame_catalog() -> Dictionary:
+	var report: Dictionary = {}
+	for spirit in get_spirits():
+		var issues: PackedStringArray = get_battle_frame_issues(spirit.spirit_id)
+		if not issues.is_empty():
+			report[spirit.spirit_id] = issues
+	return report
 
 static func element_multiplier(attacker: String, defender: String) -> float:
 	if attacker == defender:

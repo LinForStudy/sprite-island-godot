@@ -1,0 +1,66 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/props/tree_large_a.tscn" id="1_tree"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/route_marker_cluster.tscn" id="2_route"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/grassland_decor_cluster.tscn" id="3_grass"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/warm_stone_cluster.tscn" id="4_stone"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/pond_edge_cluster.tscn" id="5_flower"]
+
+[node name="GroveGateRegion" type="Node2D"]
+
+[node name="TreeNorthWest" parent="." instance=ExtResource("1_tree")]
+position = Vector2(176, 150)
+scale = Vector2(0.9, 0.9)
+
+[node name="TreeNorthCenter" parent="." instance=ExtResource("1_tree")]
+position = Vector2(520, 120)
+scale = Vector2(1.08, 1.08)
+
+[node name="TreeNorthEast" parent="." instance=ExtResource("1_tree")]
+position = Vector2(1370, 128)
+scale = Vector2(0.94, 0.94)
+
+[node name="TreeWest" parent="." instance=ExtResource("1_tree")]
+position = Vector2(126, 492)
+
+[node name="TreeEast" parent="." instance=ExtResource("1_tree")]
+position = Vector2(1402, 470)
+scale = Vector2(1.06, 1.06)
+
+[node name="TreeSouthWest" parent="." instance=ExtResource("1_tree")]
+position = Vector2(238, 778)
+scale = Vector2(0.86, 0.86)
+
+[node name="TreeSouthEast" parent="." instance=ExtResource("1_tree")]
+position = Vector2(1308, 760)
+scale = Vector2(0.9, 0.9)
+
+[node name="CrossroadMarker" parent="." instance=ExtResource("2_route")]
+position = Vector2(772, 480)
+
+[node name="WindmillRouteMarker" parent="." instance=ExtResource("2_route")]
+position = Vector2(620, 666)
+scale = Vector2(0.85, 0.85)
+
+[node name="CaveRockCluster" parent="." instance=ExtResource("4_stone")]
+position = Vector2(268, 250)
+scale = Vector2(1.25, 1.25)
+modulate = Color(0.78, 0.82, 0.88, 1)
+
+[node name="CaveGrass" parent="." instance=ExtResource("3_grass")]
+position = Vector2(348, 316)
+scale = Vector2(0.78, 0.78)
+
+[node name="WindmillGrass" parent="." instance=ExtResource("3_grass")]
+position = Vector2(512, 738)
+scale = Vector2(0.84, 0.84)
+
+[node name="CloudFlowerWest" parent="." instance=ExtResource("5_flower")]
+position = Vector2(1062, 226)
+scale = Vector2(0.72, 0.72)
+modulate = Color(0.9, 0.96, 1, 1)
+
+[node name="CloudFlowerEast" parent="." instance=ExtResource("5_flower")]
+position = Vector2(1238, 246)
+scale = Vector2(0.64, 0.64)
+modulate = Color(0.9, 0.96, 1, 1)

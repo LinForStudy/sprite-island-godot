@@ -61,7 +61,7 @@ $required = @(
   'scenes/battle/fields/battlefield_grassland.tscn',
   'scenes/battle/fields/battlefield_pond.tscn',
   'scenes/battle/fields/battlefield_warmstone.tscn',
-  'scenes/battle/fields/battlefield_forest.tscn',
+  'scenes/battle/fields/battlefield_windmill.tscn',
   'scenes/battle/fields/battlefield_cave.tscn',
   'scenes/battle/fields/battlefield_cloud.tscn',
   'scripts/world/TestNpc.gd',
@@ -148,10 +148,10 @@ foreach ($token in @(
   '[node name="HomeButton" type="Button" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons"]',
   '[node name="HabitatPanel" type="PanelContainer" parent="Root"]',
   '[node name="EncounterPanel" type="PanelContainer" parent="Root"]',
-  '[node name="DexPanel" type="PanelContainer" parent="Root"]',
-  '[node name="DexList" type="ItemList" parent="Root/DexPanel/DexMargin/DexBox/DexSplit"]',
-  '[node name="HomePanel" type="PanelContainer" parent="Root"]',
-  '[node name="HomeList" type="ItemList" parent="Root/HomePanel/HomeMargin/HomeBox/HomeSplit"]',
+  '[node name="DexPage" parent="Root" instance=ExtResource(',
+  '[node name="HomePage" parent="Root" instance=ExtResource(',
+  '[node name="TouchControls" parent="Root" instance=ExtResource(',
+  '[node name="MainMenu" parent="Root" instance=ExtResource(',
   '[node name="BattlePrepPanel" type="PanelContainer" parent="Root"]'
 )) {
   if ($gameplayScene -notmatch [regex]::Escape($token)) { throw "gameplay_ui.tscn missing UI baseline node: $token" }
@@ -192,7 +192,7 @@ foreach ($forbidden in @('EncounterObserveButton', '_observe_encounter', '.icon_
 }
 
 $gameplayScript = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scripts/ui/gameplay_ui.gd')
-foreach ($token in @('SecondaryModalDimmer', 'BattlePrepFooter', 'BattleEmptyLabel', 'BattleScrollHint', 'NOTIFICATION_WM_GO_BACK_REQUEST', 'func refresh_world_hud()', 'func set_area_info(island_name: String, area_name: String)', 'func set_world_hud_visible(is_visible: bool)', 'func show_interaction_prompt', 'func hide_interaction_prompt')) {
+foreach ($token in @('BattlePrepFooter', 'BattleEmptyLabel', 'BattleScrollHint', 'NOTIFICATION_WM_GO_BACK_REQUEST', 'func refresh_world_hud()', 'func set_area_info(island_name: String, area_name: String)', 'func set_world_hud_visible(is_visible: bool)', 'func show_interaction_prompt', 'func hide_interaction_prompt')) {
   if (($gameplayScene + "`n" + $gameplayScript) -notmatch [regex]::Escape($token)) { throw "gameplay UI missing redesigned behavior token: $token" }
 }
 if ($gameplayScript -match [regex]::Escape('.icon_max_width')) { throw 'gameplay_ui.gd must not assign Button.icon_max_width at runtime' }
@@ -342,7 +342,7 @@ foreach ($rel in $autoloadClassNames.Keys) {
 $variantMatches = Select-String -Path $gdFiles.FullName -Pattern ':\s*Variant\b'
 foreach ($match in $variantMatches) {
   $relativePath = $match.Path.Substring($root.Length).TrimStart([char]'\', [char]'/').Replace('\', '/')
-  $isJsonBoundary = ($relativePath -in @('autoload/save_manager.gd', 'scripts/core/game_catalog.gd')) -and ($match.Line -match 'var\s+parsed:\s*Variant\s*=\s*JSON\.parse_string')
+  $isJsonBoundary = ($relativePath -in @('autoload/save_manager.gd', 'autoload/settings_manager.gd', 'scripts/core/game_catalog.gd', 'scripts/world/world_scene.gd')) -and ($match.Line -match 'var\s+parsed:\s*Variant\s*=\s*JSON\.parse_string')
   if (!$isJsonBoundary) {
     throw "Unexpected Variant annotation in $relativePath line $($match.LineNumber): $($match.Line.Trim())"
   }
@@ -407,11 +407,10 @@ foreach ($token in @(
   'class_name BattleActor',
   'extends CharacterBody2D',
   'func set_spirit_texture(texture: Texture2D)',
-  'func set_spirit_id(spirit_id: String, fallback_texture: Texture2D)',
+  'func set_spirit_id(next_spirit_id: String, fallback_texture: Texture2D = null)',
   'func play_combat_action(action: StringName)',
-  'func reset_to_home()',
+  'func reset_to_home(reset_animation: bool = true)',
   'func get_home_position()',
-  'TARGET_SPRITE_WIDTH',
   'func set_target_height(height: float)',
   'func set_home_position(home_position: Vector2)'
 )) {
@@ -460,10 +459,10 @@ foreach ($token in @(
 }
 
 $playerSceneScale = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/player/player.tscn')
-if ($playerSceneScale -notmatch [regex]::Escape('scale = Vector2(1.2, 1.2)')) { throw 'player.tscn should keep the approved 1.2 world readability scale' }
+if ($playerSceneScale -notmatch [regex]::Escape('res://assets/player/explorer/generated_v2/final/player_sheet-16.png') -or $playerSceneScale -notmatch [regex]::Escape('"name": &"walk_up"')) { throw 'player.tscn must use the generated four-direction explorer animation set' }
 
 $npcSceneScale = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/world/test_npc.tscn')
-if ($npcSceneScale -notmatch [regex]::Escape('scale = Vector2(1.05, 1.05)')) { throw 'test_npc.tscn should keep the approved 1.05 world readability scale' }
+if ($npcSceneScale -notmatch [regex]::Escape('res://assets/npc/starter_guide/generated_v2/processed/guide-1.png')) { throw 'test_npc.tscn must use the cleaned generated guide artwork' }
 
 $mobileProfile = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'resources/mobile_landscape_profile.tres')
 if ($mobileProfile -notmatch [regex]::Escape('camera_zoom = Vector2(1.6, 1.6)')) { throw 'mobile profile should use camera_zoom 1.6 for closer landscape view' }
@@ -518,13 +517,13 @@ foreach ($token in @('class_name Battlefield', 'extends Node2D')) {
 }
 $battleFieldScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/battle/fields/battlefield_grassland.tscn')
 foreach ($token in @(
-  '[node name="BackgroundFar" type="Node2D"',
-  '[node name="BackgroundMid" type="Node2D"',
-  '[node name="GroundLayer" type="Node2D"',
-  '[node name="PlayerPlatform" type="Node2D"',
-  '[node name="EnemyPlatform" type="Node2D"',
-  '[node name="EnvironmentFront" type="Node2D"',
-  'grassland_ground_01.png',
+  '[node name="SkyFoundation" type="Polygon2D"',
+  '[node name="DistantHills" type="Polygon2D"',
+  '[node name="FoundationTiles" type="TileMapLayer"',
+  '[node name="BackgroundProps" type="Node2D"',
+  '[node name="ActorPlatforms" type="Node2D"',
+  '[node name="ForegroundOccluders" type="Node2D"',
+  'field_signature = "grassland-meadow-v2"',
   'tree_small_a.png',
   'wildflower_cluster.png',
   'bush_cluster_large.png'
@@ -549,7 +548,7 @@ foreach ($token in @(
   'texture_progress = SubResource("HpBarTexture")',
   'texture_progress = SubResource("EnergyBarTexture")',
   'columns = 4',
-  'custom_minimum_size = Vector2(244, 112)',
+  'custom_minimum_size = Vector2(244, 92)',
   '[node name="SkillDescriptionPanel" type="PanelContainer"'
 )) {
   if ($battleUiScene -notmatch [regex]::Escape($token)) { throw "battle_scene.tscn missing clear UI token: $token" }

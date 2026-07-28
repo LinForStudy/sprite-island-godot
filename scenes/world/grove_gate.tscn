@@ -1,19 +1,33 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/world_scene.gd" id="1_script"]
 [ext_resource type="TileSet" path="res://tilesets/world_tiles.tres" id="2_tileset"]
+[ext_resource type="TileSet" path="res://tilesets/wind_plaza_tiles.tres" id="2_visual_tileset"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialogue_ui.tscn" id="4_dialogue"]
 [ext_resource type="PackedScene" path="res://scenes/world/test_npc.tscn" id="5_npc"]
 [ext_resource type="PackedScene" path="res://scenes/world/scene_exit.tscn" id="6_exit"]
 [ext_resource type="Script" path="res://scripts/camera/camera_controller.gd" id="7_camera"]
 [ext_resource type="PackedScene" path="res://scenes/ui/gameplay_ui.tscn" id="8_gameplay"]
+[ext_resource type="PackedScene" path="res://scenes/world/regions/grove_gate_region.tscn" id="9_region"]
 
 [node name="GroveGate" type="Node2D"]
 script = ExtResource("1_script")
 scene_id = "grove_gate"
 map_preset = "grove_gate"
 default_spawn_id = "entry_default"
+
+[node name="VisualGroundLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_visual_tileset")
+z_index = -10
+
+[node name="PathLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_visual_tileset")
+z_index = -9
+
+[node name="GroundDetailLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_visual_tileset")
+z_index = -8
 
 [node name="GroundLayer" type="TileMapLayer" parent="."]
 tile_set = ExtResource("2_tileset")
@@ -37,12 +51,19 @@ z_index = 20
 
 [node name="HabitatPoints" type="Node2D" parent="."]
 
-[node name="Player" parent="." instance=ExtResource("3_player")]
+[node name="BackDecorationLayer" type="Node2D" parent="."]
+
+[node name="GroveGateRegion" parent="BackDecorationLayer" instance=ExtResource("9_region")]
+
+[node name="YSortEntities" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="YSortEntities" instance=ExtResource("3_player")]
 position = Vector2(768, 448)
 
 [node name="CameraController" type="Camera2D" parent="."]
 script = ExtResource("7_camera")
-target_path = NodePath("../Player")
+target_path = NodePath("../YSortEntities/Player")
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
@@ -50,7 +71,7 @@ position_smoothing_speed = 8.0
 
 [node name="GameplayUI" parent="." instance=ExtResource("8_gameplay")]
 
-[node name="GuideNpc" parent="." instance=ExtResource("5_npc")]
+[node name="GuideNpc" parent="YSortEntities" instance=ExtResource("5_npc")]
 position = Vector2(832, 240)
 speaker_name = "林门巡护员"
 dialogue_text = "林间入口现在有 3 个探索点：风车、山洞、云台。往南走可以回新手岛，那里还有草丛、池塘和暖石。"

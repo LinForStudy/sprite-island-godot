@@ -7,8 +7,11 @@ extends CharacterBody2D
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var interaction_area: Area2D = $InteractionArea
+const FOOTSTEP_INTERVAL := 0.34
+
 var facing_direction: String = "down"
 var nearby_interactables: Array[Area2D] = []
+var footstep_elapsed: float = 0.0
 
 func _ready() -> void:
 	add_to_group("player")
@@ -16,7 +19,7 @@ func _ready() -> void:
 	interaction_area.area_exited.connect(_on_interaction_area_exited)
 	_update_animation(false)
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if InputRouter.consume_interact():
 		if WorldState.dialogue_open:
 			_close_world_dialogue()
@@ -35,8 +38,15 @@ func _physics_process(_delta: float) -> void:
 	if input_vector.length() > 0.0:
 		velocity = input_vector.normalized() * move_speed
 		_update_facing(input_vector)
+		footstep_elapsed += delta
+		if footstep_elapsed >= FOOTSTEP_INTERVAL:
+			footstep_elapsed = 0.0
+			var audio_manager: Node = get_node_or_null("/root/AudioManager")
+			if audio_manager != null:
+				audio_manager.call("play_move")
 	else:
 		velocity = Vector2.ZERO
+		footstep_elapsed = 0.0
 
 	move_and_slide()
 	_update_animation(velocity.length() > 0.0)

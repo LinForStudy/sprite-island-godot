@@ -11,6 +11,12 @@ const PORTRAIT_CARD_SCENE: PackedScene = preload("res://scenes/ui/components/spi
 @onready var feedback: Label = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PetStage/Feedback
 @onready var actions: HBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Actions
 @onready var stats: VBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/StatsPanel/StatsMargin/Stats
+@onready var modal_shell: Control = $ModalShell
+@onready var layout: VBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout
+@onready var home_content: HBoxContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent
+@onready var partner_panel: PanelContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PartnerPanel
+@onready var pet_stage: PanelContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PetStage
+@onready var stats_panel: PanelContainer = $ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/StatsPanel
 
 var selected_spirit_id: String = ""
 var feedback_tween: Tween = null
@@ -20,8 +26,14 @@ func _ready() -> void:
 	$ModalShell.close_requested.connect(GameState.close_panel)
 	for button in actions.get_children():
 		button.pressed.connect(func() -> void: _care(button.name))
+	DisplayManager.profile_changed.connect(_apply_display_profile)
 	_style_panels()
+	_apply_display_profile(DisplayManager.get_active_profile())
 	_refresh()
+
+func _exit_tree() -> void:
+	if DisplayManager.profile_changed.is_connected(_apply_display_profile):
+		DisplayManager.profile_changed.disconnect(_apply_display_profile)
 
 func refresh() -> void:
 	if not $ModalShell.visible:
@@ -64,6 +76,7 @@ func _rebuild_partner_list(captured: Array[String]) -> void:
 		var card: Button = PORTRAIT_CARD_SCENE.instantiate()
 		partner_list.add_child(card)
 		card.configure("%s Lv.%d" % [spirit.display_name, int(pet.level)], PORTRAIT_CATALOG.get_texture(spirit_id), card.CardState.SELECTED if spirit_id == selected_spirit_id else card.CardState.RESIDENT, _element_label(spirit.element), _mood_label(String(pet.mood)))
+		_configure_partner_card(card)
 		card.pressed.connect(func() -> void:
 			selected_spirit_id = spirit_id
 			GameState.home_selected_spirit_id = spirit_id
@@ -77,6 +90,7 @@ func _build_stats(pet: Dictionary) -> void:
 		var meter: VBoxContainer = STAT_METER_SCENE.instantiate()
 		meter.label_text = String(entry[0])
 		stats.add_child(meter)
+		_configure_stat_meter(meter)
 		meter.set_value(float(entry[1]), float(entry[2]), true)
 
 func _clear_stats() -> void:
@@ -176,3 +190,50 @@ func _box(color: Color, border: Color, width: int, radius: int) -> StyleBoxFlat:
 	box.set_border_width_all(width)
 	box.set_corner_radius_all(radius)
 	return box
+func _apply_display_profile(_profile: DeviceProfile) -> void:
+	if not is_node_ready():
+		return
+	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
+	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	modal_shell.call("set_preferred_size", Vector2(740.0, 340.0) * density if compact else Vector2(1080.0, 610.0))
+	layout.add_theme_constant_override("separation", int(round((6.0 * density) if compact else 14.0)))
+	home_content.add_theme_constant_override("separation", int(round((8.0 * density) if compact else 18.0)))
+	partner_panel.custom_minimum_size = Vector2(92.0, 0.0) * density if compact else Vector2(140.0, 0.0)
+	pet_stage.custom_minimum_size = Vector2(255.0, 0.0) * density if compact else Vector2(390.0, 0.0)
+	stats_panel.custom_minimum_size = Vector2(210.0, 0.0) * density if compact else Vector2(310.0, 0.0)
+	portrait.custom_minimum_size.y = 106.0 * density if compact else 260.0
+	pet_name.add_theme_font_size_override("font_size", int(round((20.0 * density) if compact else 30.0 * DisplayManager.get_font_scale())))
+	hint.add_theme_font_size_override("font_size", int(round((12.0 * density) if compact else 16.0 * DisplayManager.get_font_scale())))
+	feedback.add_theme_font_size_override("font_size", int(round((16.0 * density) if compact else 22.0 * DisplayManager.get_font_scale())))
+	actions.add_theme_constant_override("separation", int(round((6.0 * density) if compact else 16.0)))
+	for button in actions.get_children():
+		button.custom_minimum_size = Vector2(78.0, 60.0) * density if compact else Vector2(112.0, 88.0)
+		var icon: TextureRect = button.get_node("Layout/Icon") as TextureRect
+		var caption: Label = button.get_node("Layout/Caption") as Label
+		icon.custom_minimum_size = Vector2(24.0, 24.0) * density if compact else Vector2(32.0, 32.0)
+		caption.add_theme_font_size_override("font_size", int(round((12.0 * density) if compact else 16.0 * DisplayManager.get_font_scale())))
+	_refresh()
+
+
+func _configure_partner_card(card: Button) -> void:
+	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
+	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	card.custom_minimum_size = Vector2(64.0, 82.0) * density if compact else Vector2(104.0, 140.0)
+	var card_portrait: TextureRect = card.get_node("Card/Layout/Portrait") as TextureRect
+	var card_name: Label = card.get_node("Card/Layout/Name") as Label
+	var card_status: Label = card.get_node("Card/Layout/Status") as Label
+	card_portrait.custom_minimum_size = Vector2(58.0, 44.0) * density if compact else Vector2(94.0, 92.0)
+	card_name.add_theme_font_size_override("font_size", int(round((10.0 * density) if compact else 16.0)))
+	card_status.add_theme_font_size_override("font_size", int(round((9.0 * density) if compact else 12.0)))
+
+
+func _configure_stat_meter(meter: VBoxContainer) -> void:
+	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
+	var density: float = DisplayManager.get_canvas_density_scale() if compact else 1.0
+	var meter_label: Label = meter.get_node("Header/Label") as Label
+	var meter_value: Label = meter.get_node("Header/Value") as Label
+	var meter_bar: ProgressBar = meter.get_node("Bar") as ProgressBar
+	meter.add_theme_constant_override("separation", int(round((1.0 * density) if compact else 4.0)))
+	meter_label.add_theme_font_size_override("font_size", int(round((11.0 * density) if compact else 16.0 * DisplayManager.get_font_scale())))
+	meter_value.add_theme_font_size_override("font_size", int(round((11.0 * density) if compact else 16.0 * DisplayManager.get_font_scale())))
+	meter_bar.custom_minimum_size.y = 10.0 * density if compact else 20.0
