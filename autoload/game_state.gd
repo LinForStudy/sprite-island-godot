@@ -20,6 +20,11 @@ func set_message(text: String) -> void:
 	message_changed.emit(message)
 
 func open_habitat_panel(habitat_id: String) -> void:
+	if not SaveManager.is_habitat_unlocked(habitat_id):
+		var locked_habitat: HabitatData = GameCatalog.get_habitat_by_id(habitat_id)
+		var locked_name: String = locked_habitat.display_name if locked_habitat != null else habitat_id
+		set_message("%s还在等待新的小岛伙伴。先收服萌灵并照料它们吧。" % locked_name)
+		return
 	active_habitat_id = habitat_id
 	current_panel = "habitat"
 	ui_state_changed.emit(current_panel)

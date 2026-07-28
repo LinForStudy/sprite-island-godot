@@ -27,6 +27,13 @@ default_spawn_id = "entry_default"
 [node name="VisualGroundLayer" type="TileMapLayer" parent="."]
 tile_set = ExtResource("2_wind_plaza")
 z_index = -10
+[node name="PathLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_wind_plaza")
+z_index = -9
+
+[node name="GroundDetailLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_wind_plaza")
+z_index = -8
 
 [node name="GroundLayer" type="TileMapLayer" parent="."]
 tile_set = ExtResource("2_tileset")
@@ -51,19 +58,19 @@ z_index = 20
 
 [node name="HabitatPoints" type="Node2D" parent="."]
 
-[node name="RegionDecor" type="Node2D" parent="."]
+[node name="BackDecorationLayer" type="Node2D" parent="."]
 
-[node name="PlazaRegion" parent="RegionDecor" instance=ExtResource("10_plaza")]
+[node name="PlazaRegion" parent="BackDecorationLayer" instance=ExtResource("10_plaza")]
 
-[node name="GrasslandRegion" parent="RegionDecor" instance=ExtResource("11_grassland")]
+[node name="GrasslandRegion" parent="BackDecorationLayer" instance=ExtResource("11_grassland")]
 
-[node name="PondRegion" parent="RegionDecor" instance=ExtResource("12_pond")]
+[node name="PondRegion" parent="BackDecorationLayer" instance=ExtResource("12_pond")]
 
-[node name="WarmstoneRegion" parent="RegionDecor" instance=ExtResource("13_warm")]
+[node name="WarmstoneRegion" parent="BackDecorationLayer" instance=ExtResource("13_warm")]
 
-[node name="HomeRegion" parent="RegionDecor" instance=ExtResource("14_home_region")]
+[node name="HomeRegion" parent="BackDecorationLayer" instance=ExtResource("14_home_region")]
 
-[node name="ExitRegion" parent="RegionDecor" instance=ExtResource("15_exit_region")]
+[node name="ExitRegion" parent="BackDecorationLayer" instance=ExtResource("15_exit_region")]
 
 [node name="Props" type="Node2D" parent="."]
 y_sort_enabled = true
@@ -73,12 +80,15 @@ z_index = 24
 
 [node name="ForegroundDecor" parent="ForegroundProps" instance=ExtResource("16_foreground")]
 
-[node name="Player" parent="." instance=ExtResource("3_player")]
+[node name="YSortEntities" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="YSortEntities" instance=ExtResource("3_player")]
 position = Vector2(760, 560)
 
 [node name="CameraController" type="Camera2D" parent="."]
 script = ExtResource("8_camera")
-target_path = NodePath("../Player")
+target_path = NodePath("../YSortEntities/Player")
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
@@ -86,7 +96,7 @@ position_smoothing_speed = 8.0
 
 [node name="GameplayUI" parent="." instance=ExtResource("9_gameplay")]
 
-[node name="GuideNpc" parent="." instance=ExtResource("5_npc")]
+[node name="GuideNpc" parent="YSortEntities" instance=ExtResource("5_npc")]
 position = Vector2(672, 496)
 speaker_name = "小岛守望员"
 dialogue_text = "这里是迎风广场。顺着三条支路去草丛、池塘和暖石看看；右下角的路能通往林间入口。"

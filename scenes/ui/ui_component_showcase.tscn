@@ -1,0 +1,69 @@
+[gd_scene load_steps=9 format=3]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/game_modal_shell.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/spirit_portrait_card.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/stat_meter.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/icon_action_button.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/game_close_button.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/filter_chip.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/element_badge.tscn" id="7"]
+[node name="UiComponentShowcase" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.24,0.42,0.25,1)
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 24.0
+theme_override_font_sizes/font_size = 32
+text = "UI 组件展示 · 1280×720"
+[node name="Cards" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 100.0
+theme_override_constants/separation = 16
+[node name="Normal" parent="Cards" instance=ExtResource("2")]
+[node name="Selected" parent="Cards" instance=ExtResource("2")]
+[node name="Unknown" parent="Cards" instance=ExtResource("2")]
+[node name="Resident" parent="Cards" instance=ExtResource("2")]
+[node name="Meters" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 112.0
+offset_right = 1180.0
+theme_override_constants/separation = 16
+[node name="Hp" parent="Meters" instance=ExtResource("3")]
+[node name="Exp" parent="Meters" instance=ExtResource("3")]
+[node name="Actions" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 300.0
+theme_override_constants/separation = 12
+[node name="Feed" parent="Actions" instance=ExtResource("4")]
+[node name="Clean" parent="Actions" instance=ExtResource("4")]
+[node name="Modal" parent="." instance=ExtResource("1")]
+visible = true
+[node name="ComponentControls" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 520.0
+theme_override_constants/separation = 14
+
+[node name="Close" parent="ComponentControls" instance=ExtResource("5")]
+layout_mode = 2
+
+[node name="AllFilter" parent="ComponentControls" instance=ExtResource("6")]
+layout_mode = 2
+text = "全部"
+selected = true
+
+[node name="WaterBadge" parent="ComponentControls" instance=ExtResource("7")]
+layout_mode = 2

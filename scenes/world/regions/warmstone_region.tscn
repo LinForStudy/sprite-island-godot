@@ -19,9 +19,9 @@ position = Vector2(1326, 130)
 scale = Vector2(0.88, 0.88)
 
 [node name="WarmGrass" parent="." instance=ExtResource("3_grass")]
-position = Vector2(1100, 186)
+position = Vector2(1090, 238)
 scale = Vector2(0.82, 0.82)
 
 [node name="WarmRoute" parent="." instance=ExtResource("4_route")]
-position = Vector2(1210, 342)
+position = Vector2(1198, 356)
 scale = Vector2(0.76, 0.76)

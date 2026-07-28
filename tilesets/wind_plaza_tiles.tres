@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=19 format=3]
+[gd_resource type="TileSet" load_steps=23 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_base_01.png" id="1_grass1"]
 [ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_base_02.png" id="2_grass2"]
@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grassland_ground_02.png" id="7_grassland2"]
 [ext_resource type="Texture2D" path="res://assets/world/tiles/grass/tall_grass_tile.png" id="8_tallgrass"]
 [ext_resource type="Texture2D" path="res://assets/world/tiles/grass/grass_path_edge.png" id="9_grassedge"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/03_water.png" id="10_water"]
+[ext_resource type="Texture2D" path="res://assets/incoming/world/tiles/13_soil.png" id="11_soil"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grass1"]
 texture = ExtResource("1_grass1")
@@ -55,6 +57,15 @@ texture = ExtResource("9_grassedge")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_water"]
+texture = ExtResource("10_water")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_soil"]
+texture = ExtResource("11_soil")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
 [resource]
 tile_size = Vector2i(64, 64)
 sources/0 = SubResource("TileSetAtlasSource_grass1")
@@ -66,3 +77,5 @@ sources/5 = SubResource("TileSetAtlasSource_grassland1")
 sources/6 = SubResource("TileSetAtlasSource_grassland2")
 sources/7 = SubResource("TileSetAtlasSource_tallgrass")
 sources/8 = SubResource("TileSetAtlasSource_grassedge")
+sources/9 = SubResource("TileSetAtlasSource_water")
+sources/10 = SubResource("TileSetAtlasSource_soil")

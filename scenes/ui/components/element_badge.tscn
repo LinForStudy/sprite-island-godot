@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/element_badge.gd" id="1_script"]
+
+[node name="ElementBadge" type="PanelContainer"]
+custom_minimum_size = Vector2(44, 28)
+layout_mode = 2
+script = ExtResource("1_script")
+
+[node name="Margin" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Margin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Text" type="Label" parent="Margin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+vertical_alignment = 1

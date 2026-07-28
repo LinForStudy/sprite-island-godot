@@ -26,11 +26,14 @@ position = Vector2(1326, 130)
 scale = Vector2(0.82, 0.82)
 
 [node name="TreeCanopyHome" parent="." instance=ExtResource("1_canopy")]
-position = Vector2(164, 684)
+position = Vector2(210, 664)
 scale = Vector2(0.8, 0.8)
 
+[node name="TreeCanopyExit" parent="." instance=ExtResource("1_canopy")]
+position = Vector2(1248, 674)
+scale = Vector2(0.8, 0.8)
 [node name="HomeRoof" parent="." instance=ExtResource("2_roof")]
-position = Vector2(330, 716)
+position = Vector2(360, 684)
 
 [node name="GrassFront" parent="." instance=ExtResource("3_grass")]
 position = Vector2(454, 272)

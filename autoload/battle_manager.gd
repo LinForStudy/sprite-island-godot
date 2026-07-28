@@ -83,6 +83,15 @@ func start_battle(player_spirit_id: String) -> void:
 	GameState.set_message("挑战开始，选一个技能吧。")
 	battle_state_changed.emit()
 
+func choose_player_position(slot: String) -> void:
+	if current_phase != BattlePhase.PLAYER_CHOOSE:
+		return
+	if slot not in ["left", "center", "right"]:
+		return
+	battle_state.player_position_slot = slot
+	_append_log("站位调整到%s。" % {"left": "左侧", "center": "中央", "right": "右侧"}[slot])
+	battle_state_changed.emit()
+
 func use_skill(skill_index: int) -> void:
 	if current_phase != BattlePhase.PLAYER_CHOOSE:
 		return
@@ -399,7 +408,7 @@ func _append_log(line: String) -> void:
 	battle_state.log = log
 
 func _default_battle_state() -> Dictionary:
-	return {"status": "idle", "habitat_id": "", "player_spirit_id": "", "enemy_spirit_id": "", "player_level": 1, "enemy_level": 1, "enemy_hp": 0, "player_energy": 0, "player_guard_turns": 0, "log": []}
+	return {"status": "idle", "habitat_id": "", "player_spirit_id": "", "enemy_spirit_id": "", "player_level": 1, "enemy_level": 1, "enemy_hp": 0, "player_energy": 0, "player_guard_turns": 0, "player_position_slot": "center", "log": []}
 
 func _default_battle_result() -> Dictionary:
 	return {"status": "idle", "player_name": "", "player_level": 1, "player_hp": 0, "player_max_hp": 0, "enemy_name": "", "enemy_level": 1, "enemy_spirit_id": "", "exp_gained": 0, "level_messages": [], "capture_eligible": false, "capture_already_owned": false, "capture_status": "locked", "capture_ball": {}, "capture_chance": 0.0, "capture_attempted": false, "capture_message": "", "equipment_drop": "", "message": ""}

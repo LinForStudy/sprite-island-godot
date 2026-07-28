@@ -6,6 +6,8 @@
 .godot_battle_smoke_localappdata_gui/
 .godot_smoke_appdata/
 .godot_smoke_localappdata/
+.godot_ui_appdata/
+.godot_ui_localappdata/
 .godot-scene-smoke.log
 *.log
 *.tmp

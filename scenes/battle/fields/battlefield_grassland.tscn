@@ -12,12 +12,20 @@
 [ext_resource type="Texture2D" path="res://assets/world/props/plaza/small_bush_a.png" id="10_bush_small"]
 [ext_resource type="Texture2D" path="res://assets/world/props/plaza/stone_small_a.png" id="11_stone"]
 [ext_resource type="Texture2D" path="res://assets/world/props/grassland/grass_spirit_marker.png" id="12_marker"]
+[ext_resource type="Texture2D" path="res://assets/battle/backgrounds/forest_clearing_1280x720.png" id="13_forest_clearing"]
 
 [node name="BattlefieldVisual" type="Node2D"]
 script = ExtResource("1_script")
 habitat_id = "grassland"
 
+[node name="ForestClearingBackdrop" type="Sprite2D" parent="."]
+z_index = -100
+centered = false
+scale = Vector2(0.76555, 0.76514)
+texture = ExtResource("13_forest_clearing")
+
 [node name="BackgroundFar" type="Node2D" parent="."]
+visible = false
 z_index = -60
 
 [node name="SkyWash" type="Polygon2D" parent="BackgroundFar"]
@@ -51,6 +59,7 @@ texture = ExtResource("6_tree_small")
 modulate = Color(0.53, 0.68, 0.48, 0.56)
 
 [node name="BackgroundMid" type="Node2D" parent="."]
+visible = false
 z_index = -40
 
 [node name="MidBushLeft" type="Sprite2D" parent="BackgroundMid"]
@@ -84,6 +93,7 @@ scale = Vector2(0.38, 0.38)
 texture = ExtResource("7_flowers")
 
 [node name="GroundLayer" type="Node2D" parent="."]
+visible = false
 z_index = -30
 
 [node name="GroundShape" type="Polygon2D" parent="GroundLayer"]
@@ -245,15 +255,18 @@ z_index = -10
 position = Vector2(384, 472)
 
 [node name="PlayerPatch" type="Polygon2D" parent="PlayerPlatform"]
+visible = false
 color = Color(0.53, 0.78, 0.42, 0.88)
 polygon = PackedVector2Array(-172, -34, -122, -68, -34, -82, 78, -72, 156, -36, 176, 4, 134, 38, 34, 52, -82, 42, -160, 12)
 
 [node name="PlayerFlowers" type="Sprite2D" parent="PlayerPlatform"]
+visible = false
 position = Vector2(-112, 12)
 scale = Vector2(0.34, 0.34)
 texture = ExtResource("7_flowers")
 
 [node name="PlayerGrass" type="Sprite2D" parent="PlayerPlatform"]
+visible = false
 position = Vector2(118, -8)
 scale = Vector2(0.34, 0.34)
 texture = ExtResource("8_grass_a")
@@ -263,15 +276,18 @@ z_index = -10
 position = Vector2(822, 306)
 
 [node name="EnemyPatch" type="Polygon2D" parent="EnemyPlatform"]
+visible = false
 color = Color(0.55, 0.79, 0.44, 0.84)
 polygon = PackedVector2Array(-128, -28, -84, -54, -8, -62, 78, -50, 126, -18, 132, 18, 82, 42, -10, 46, -98, 32)
 
 [node name="EnemyStone" type="Sprite2D" parent="EnemyPlatform"]
+visible = false
 position = Vector2(96, 15)
 scale = Vector2(0.54, 0.54)
 texture = ExtResource("11_stone")
 
 [node name="EnemyMarker" type="Sprite2D" parent="EnemyPlatform"]
+visible = false
 position = Vector2(-90, -4)
 scale = Vector2(0.28, 0.28)
 texture = ExtResource("12_marker")

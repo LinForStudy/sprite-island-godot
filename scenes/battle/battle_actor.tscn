@@ -2,7 +2,12 @@
 
 [ext_resource type="Script" path="res://scripts/battle/battle_actor.gd" id="1_script"]
 
-[node name="BattleActor" type="Node2D"]
+[sub_resource type="CapsuleShape2D" id="ActorCollider"]
+
+radius = 20.0
+height = 54.0
+
+[node name="BattleActor" type="CharacterBody2D"]
 z_index = 20
 script = ExtResource("1_script")
 
@@ -17,6 +22,14 @@ z_index = 1
 [node name="SpiritSprite" type="Sprite2D" parent="VisualRoot"]
 centered = true
 
+[node name="AnimatedSpirit" type="AnimatedSprite2D" parent="VisualRoot"]
+centered = true
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -22)
+shape = SubResource("ActorCollider")
+
 [node name="CastPoint" type="Marker2D" parent="VisualRoot"]
 position = Vector2(36, -118)
 
@@ -26,7 +39,7 @@ position = Vector2(0, -116)
 [node name="EffectAnchor" type="Marker2D" parent="VisualRoot"]
 position = Vector2(0, -148)
 
-[node name="FloatingTextAnchor" type="Marker2D" parent="."]
+[node name="DamageNumberAnchor" type="Marker2D" parent="."]
 position = Vector2(0, -216)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

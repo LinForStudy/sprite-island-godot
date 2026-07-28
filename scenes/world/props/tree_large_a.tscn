@@ -6,6 +6,10 @@
 
 [node name="TreeLargeA" type="Node2D"]
 
+[node name="GroundShadow" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-28, 26, -18, 18, 20, 18, 32, 25, 20, 32, -18, 32)
+color = Color(0.15, 0.2, 0.08, 0.24)
+z_index = -1
 [node name="Trunk" type="Sprite2D" parent="."]
 texture = ExtResource("1_trunk")
 position = Vector2(0, -12)

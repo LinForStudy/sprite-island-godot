@@ -17,7 +17,7 @@ func _ready() -> void:
 	_update_animation(false)
 
 func _physics_process(_delta: float) -> void:
-	if Input.is_action_just_pressed("interact"):
+	if InputRouter.consume_interact():
 		if WorldState.dialogue_open:
 			_close_world_dialogue()
 			return
@@ -31,7 +31,7 @@ func _physics_process(_delta: float) -> void:
 		WorldState.remember_player_state(global_position, facing_direction)
 		return
 
-	var input_vector: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var input_vector: Vector2 = InputRouter.get_move_vector()
 	if input_vector.length() > 0.0:
 		velocity = input_vector.normalized() * move_speed
 		_update_facing(input_vector)

@@ -8,6 +8,10 @@
 
 [node name="CottageMain" type="Node2D"]
 
+[node name="GroundShadow" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-82, 38, -66, 28, 72, 28, 88, 38, 72, 50, -66, 50)
+color = Color(0.15, 0.18, 0.08, 0.22)
+z_index = -1
 [node name="Wall" type="Sprite2D" parent="."]
 texture = ExtResource("1_wall")
 position = Vector2(0, -28)

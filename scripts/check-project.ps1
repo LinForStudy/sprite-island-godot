@@ -12,12 +12,33 @@ $required = @(
   'docs/GODOT_UI_MAP_PLAN.md',
   'docs/ui-kit-integration-report.md',
   'docs/ui-component-library.md',
+  'docs/game-ui-redesign-roadmap.md',
+  'docs/ui-redesign-baseline/world-hud-before-1280x720.png',
+  'docs/ui-redesign-baseline/dex-before-1280x720.png',
+  'docs/ui-redesign-baseline/home-before-1280x720.png',
+  'docs/ui-redesign-baseline/README.md',
   'tilesets/world_tiles.tres',
   'data/catalog/habitats_phase1.json',
   'data/catalog/spirits_phase1.json',
   'scenes/player/player.tscn',
   'scenes/ui/dialogue_ui.tscn',
   'scenes/ui/gameplay_ui.tscn',
+  'scenes/ui/components/game_modal_shell.tscn',
+  'scripts/ui/components/game_modal_shell.gd',
+  'scenes/ui/components/game_close_button.tscn',
+  'scripts/ui/components/game_close_button.gd',
+  'scenes/ui/components/filter_chip.tscn',
+  'scripts/ui/components/filter_chip.gd',
+  'scenes/ui/components/element_badge.tscn',
+  'scripts/ui/components/element_badge.gd',
+  'resources/themes/ui/modal_shell_panel.tres',
+  'scenes/ui/components/stat_meter.tscn',
+  'scripts/ui/components/stat_meter.gd',
+  'scenes/ui/components/icon_action_button.tscn',
+  'scenes/ui/ui_component_showcase.tscn',
+  'scripts/ui/components/icon_action_button.gd',
+  'scenes/ui/components/spirit_portrait_card.tscn',
+  'scripts/ui/components/spirit_portrait_card.gd',
   'scenes/battle/battle_scene.tscn',
   'scenes/world/habitat_point.tscn',
   'scenes/world/test_npc.tscn',
@@ -119,6 +140,63 @@ if ($gameplayScene -match [regex]::Escape('[node name="BattlePanel"')) {
   throw 'gameplay_ui.tscn must not contain the old in-map BattlePanel; battles use scenes/battle/battle_scene.tscn'
 }
 
+# UI-002 baseline: gameplay_ui.tscn currently owns the HUD and transitional
+# gameplay panels. Keep these anchor nodes stable until each page is migrated.
+foreach ($token in @(
+  '[node name="TopHUD" type="HBoxContainer" parent="Root/HUDMargin/ScreenLayout"]',
+  '[node name="DexButton" type="Button" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons"]',
+  '[node name="HomeButton" type="Button" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons"]',
+  '[node name="HabitatPanel" type="PanelContainer" parent="Root"]',
+  '[node name="EncounterPanel" type="PanelContainer" parent="Root"]',
+  '[node name="DexPanel" type="PanelContainer" parent="Root"]',
+  '[node name="DexList" type="ItemList" parent="Root/DexPanel/DexMargin/DexBox/DexSplit"]',
+  '[node name="HomePanel" type="PanelContainer" parent="Root"]',
+  '[node name="HomeList" type="ItemList" parent="Root/HomePanel/HomeMargin/HomeBox/HomeSplit"]',
+  '[node name="BattlePrepPanel" type="PanelContainer" parent="Root"]'
+)) {
+  if ($gameplayScene -notmatch [regex]::Escape($token)) { throw "gameplay_ui.tscn missing UI baseline node: $token" }
+}
+
+$modalShellScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/ui/components/game_modal_shell.tscn')
+foreach ($token in @(
+  '[node name="GameModalShell" type="Control"]',
+  '[node name="Dimmer" type="Button" parent="."]',
+  '[node name="ModalPanel" type="PanelContainer" parent="ModalCenter"]',
+  '[node name="Title" type="Label" parent="ModalCenter/ModalPanel/PanelMargin/PanelLayout/Header"]',
+  '[node name="CloseButton" parent="ModalCenter/ModalPanel/PanelMargin/PanelLayout/Header" instance=ExtResource("3_close_button")]',
+  '[ext_resource type="PackedScene" path="res://scenes/ui/components/game_close_button.tscn" id="3_close_button"]',
+  'theme_override_styles/panel = ExtResource("2_modal_style")'
+)) {
+  if ($modalShellScene -notmatch [regex]::Escape($token)) { throw "game_modal_shell.tscn missing token: $token" }
+}
+$portraitCardScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/ui/components/spirit_portrait_card.tscn')
+foreach ($token in @('[node name="SpiritPortraitCard" type="Button"]', '[node name="Portrait" type="TextureRect" parent="Card/Layout"]', '[node name="UnknownSilhouette" type="Polygon2D" parent="Card"]')) {
+  if ($portraitCardScene -notmatch [regex]::Escape($token)) { throw "spirit_portrait_card.tscn missing token: $token" }
+}
+$portraitCardScript = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scripts/ui/components/spirit_portrait_card.gd')
+foreach ($token in @('enum CardState', 'NORMAL', 'SELECTED', 'UNKNOWN', 'RESIDENT', 'func set_card_state')) {
+  if ($portraitCardScript -notmatch [regex]::Escape($token)) { throw "spirit_portrait_card.gd missing token: $token" }
+}
+
+$modalShellStyle = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'resources/themes/ui/modal_shell_panel.tres')
+foreach ($token in @('bg_color = Color(1, 0.976471, 0.913725, 1)', 'border_color = Color(0.545098, 0.407843, 0.258824, 1)', 'corner_radius_top_left = 20', 'shadow_size = 12')) {
+  if ($modalShellStyle -notmatch [regex]::Escape($token)) { throw "modal_shell_panel.tres missing token: $token" }
+}
+$modalShellScript = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scripts/ui/components/game_modal_shell.gd')
+foreach ($token in @('signal close_requested', 'func open()', 'func close()', 'ui_cancel', 'NOTIFICATION_WM_GO_BACK_REQUEST')) {
+  if ($modalShellScript -notmatch [regex]::Escape($token)) { throw "game_modal_shell.gd missing token: $token" }
+}
+
+foreach ($forbidden in @('EncounterObserveButton', '_observe_encounter', '.icon_max_width')) {
+  if ($gameplayScene -match [regex]::Escape($forbidden)) { throw "gameplay_ui must not reintroduce UI regression token: $forbidden" }
+}
+
+$gameplayScript = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scripts/ui/gameplay_ui.gd')
+foreach ($token in @('SecondaryModalDimmer', 'BattlePrepFooter', 'BattleEmptyLabel', 'BattleScrollHint', 'NOTIFICATION_WM_GO_BACK_REQUEST', 'func refresh_world_hud()', 'func set_area_info(island_name: String, area_name: String)', 'func set_world_hud_visible(is_visible: bool)', 'func show_interaction_prompt', 'func hide_interaction_prompt')) {
+  if (($gameplayScene + "`n" + $gameplayScript) -notmatch [regex]::Escape($token)) { throw "gameplay UI missing redesigned behavior token: $token" }
+}
+if ($gameplayScript -match [regex]::Escape('.icon_max_width')) { throw 'gameplay_ui.gd must not assign Button.icon_max_width at runtime' }
+
 $worldScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/world/test_world.tscn')
 foreach ($token in @(
   '[node name="GroundLayer" type="TileMapLayer" parent="."]',
@@ -187,6 +265,22 @@ function New-TextFromCodePoints([int[]]$codePoints) {
 
 $playerFacingFiles = @(
   'scenes/ui/gameplay_ui.tscn',
+  'scenes/ui/components/game_modal_shell.tscn',
+  'scripts/ui/components/game_modal_shell.gd',
+  'scenes/ui/components/game_close_button.tscn',
+  'scripts/ui/components/game_close_button.gd',
+  'scenes/ui/components/filter_chip.tscn',
+  'scripts/ui/components/filter_chip.gd',
+  'scenes/ui/components/element_badge.tscn',
+  'scripts/ui/components/element_badge.gd',
+  'resources/themes/ui/modal_shell_panel.tres',
+  'scenes/ui/components/stat_meter.tscn',
+  'scripts/ui/components/stat_meter.gd',
+  'scenes/ui/components/icon_action_button.tscn',
+  'scenes/ui/ui_component_showcase.tscn',
+  'scripts/ui/components/icon_action_button.gd',
+  'scenes/ui/components/spirit_portrait_card.tscn',
+  'scripts/ui/components/spirit_portrait_card.gd',
   'scenes/ui/dialogue_ui.tscn',
   'scripts/ui/gameplay_ui.gd',
   'scripts/ui/DialogueUI.gd',
@@ -277,7 +371,7 @@ foreach ($token in @(
   '[node name="FloatingTextLayer"',
   '[node name="PlayerHpBar" type="TextureProgressBar"',
   '[node name="EnemyHpBar" type="TextureProgressBar"',
-  '[node name="PlayerEnergyBar" type="TextureProgressBar"',
+  '[node name="EnergyBar" type="TextureProgressBar"',
   '[node name="SkillButton0" type="Button"',
   '[node name="SkillButton3" type="Button"',
   '[node name="ResultPanel" type="PanelContainer"',
@@ -311,8 +405,10 @@ foreach ($token in @(
 $battleActorScript = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scripts/battle/battle_actor.gd')
 foreach ($token in @(
   'class_name BattleActor',
-  'extends Node2D',
+  'extends CharacterBody2D',
   'func set_spirit_texture(texture: Texture2D)',
+  'func set_spirit_id(spirit_id: String, fallback_texture: Texture2D)',
+  'func play_combat_action(action: StringName)',
   'func reset_to_home()',
   'func get_home_position()',
   'TARGET_SPRITE_WIDTH',
@@ -324,8 +420,10 @@ foreach ($token in @(
 
 $battleActorScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/battle/battle_actor.tscn')
 foreach ($token in @(
-  '[node name="BattleActor" type="Node2D"]',
+  '[node name="BattleActor" type="CharacterBody2D"]',
   '[node name="SpiritSprite" type="Sprite2D"',
+  '[node name="AnimatedSpirit" type="AnimatedSprite2D"',
+  '[node name="CollisionShape2D" type="CollisionShape2D"',
   '[node name="Shadow" type="Polygon2D"',
   '[node name="VisualRoot" type="Node2D"',
   '[node name="AnimationPlayer" type="AnimationPlayer"'
@@ -362,16 +460,16 @@ foreach ($token in @(
 }
 
 $playerSceneScale = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/player/player.tscn')
-if ($playerSceneScale -notmatch [regex]::Escape('scale = Vector2(0.95, 0.95)')) { throw 'player.tscn should scale 64x64 art to 0.95 for child readability' }
+if ($playerSceneScale -notmatch [regex]::Escape('scale = Vector2(1.2, 1.2)')) { throw 'player.tscn should keep the approved 1.2 world readability scale' }
 
 $npcSceneScale = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/world/test_npc.tscn')
-if ($npcSceneScale -notmatch [regex]::Escape('scale = Vector2(0.84, 0.84)')) { throw 'test_npc.tscn should scale 64x64 art to 0.84' }
+if ($npcSceneScale -notmatch [regex]::Escape('scale = Vector2(1.05, 1.05)')) { throw 'test_npc.tscn should keep the approved 1.05 world readability scale' }
 
 $mobileProfile = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'resources/mobile_landscape_profile.tres')
 if ($mobileProfile -notmatch [regex]::Escape('camera_zoom = Vector2(1.6, 1.6)')) { throw 'mobile profile should use camera_zoom 1.6 for closer landscape view' }
 
 $uiArtCount = @(Get-ChildItem -Path (Join-Path $root 'assets/ui') -Filter '*.png' -File -Recurse -ErrorAction SilentlyContinue).Count
-if ($uiArtCount -ne 37) { throw "assets/ui should contain 37 png files from mengling_ui_kit_and_godot_plan.zip, found $uiArtCount" }
+if ($uiArtCount -lt 37) { throw "assets/ui should retain at least the 37 original UI PNG files, found $uiArtCount" }
 
 $themeText = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'resources/themes/cozy_theme.tres')
 foreach ($token in @(
@@ -404,7 +502,7 @@ foreach ($token in @(
   'res://assets/ui/icons/nav/nav_home.png',
   'res://assets/ui/icons/actions/action_feed.png',
   'res://assets/ui/icons/actions/action_clean.png',
-  'icon_max_width = 28',
+  '[node name="Content" type="VBoxContainer" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons/DexButton"]',
   'AreaIntroToast',
   'QuestCard',
   'HUDMargin',
@@ -447,10 +545,12 @@ foreach ($token in @(
   '[node name="EnemyStatusCard" type="PanelContainer"',
   '[node name="PlayerHpBar" type="TextureProgressBar"',
   '[node name="EnemyHpBar" type="TextureProgressBar"',
-  '[node name="PlayerEnergyBar" type="TextureProgressBar"',
+  '[node name="EnergyBar" type="TextureProgressBar"',
   'texture_progress = SubResource("HpBarTexture")',
   'texture_progress = SubResource("EnergyBarTexture")',
-  'custom_minimum_size = Vector2(194, 74)'
+  'columns = 4',
+  'custom_minimum_size = Vector2(244, 112)',
+  '[node name="SkillDescriptionPanel" type="PanelContainer"'
 )) {
   if ($battleUiScene -notmatch [regex]::Escape($token)) { throw "battle_scene.tscn missing clear UI token: $token" }
 }
@@ -530,7 +630,7 @@ foreach ($token in @('grass_base_01.png', 'grass_base_02.png', 'grass_base_03.pn
 }
 
 $testWorldScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/world/test_world.tscn')
-foreach ($token in @('VisualGroundLayer', 'res://tilesets/wind_plaza_tiles.tres', 'RegionDecor')) {
+foreach ($token in @('VisualGroundLayer', 'PathLayer', 'GroundDetailLayer', 'BackDecorationLayer', 'YSortEntities', 'res://tilesets/wind_plaza_tiles.tres')) {
   if ($testWorldScene -notmatch [regex]::Escape($token)) { throw "test_world.tscn missing wind plaza token: $token" }
 }
 
@@ -545,7 +645,7 @@ foreach ($token in @('grassland_ground_01.png', 'grassland_ground_02.png', 'tall
 }
 
 $grasslandRegionScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/world/regions/grassland_region.tscn')
-foreach ($token in @('grassland_decor_cluster.tscn', 'MainGrasslandDecor', 'GrasslandDecorWest', 'GrasslandDecorEast')) {
+foreach ($token in @('grassland_decor_cluster.tscn', 'MainGrasslandDecor', 'GrasslandDecorWest')) {
   if ($grasslandRegionScene -notmatch [regex]::Escape($token)) { throw "grassland_region.tscn missing token: $token" }
 }
 
@@ -604,11 +704,14 @@ $worldScript = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scripts/world/w
 if ($worldScript -match [regex]::Escape('player.get_node("Camera2D")')) {
   throw 'world camera limits must not look up Player/Camera2D'
 }
+if ($worldScript -notmatch [regex]::Escape('get_node_or_null("YSortEntities/Player")') -or $worldScript -notmatch [regex]::Escape('get_node_or_null("Player")')) {
+  throw 'shared world scene script must support both YSortEntities/Player and root Player layouts'
+}
 
 $godotCandidates = @(
+  'C:\Program Files\Godot\Godot_v4.7-stable_win64_console.exe',
   (Get-Command godot4 -ErrorAction SilentlyContinue).Source,
   (Get-Command godot -ErrorAction SilentlyContinue).Source,
-  'C:\Program Files\Godot\Godot_v4.7-stable_win64_console.exe',
   'C:\Program Files\Godot\Godot_v4.7-stable_win64.exe'
 ) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
 

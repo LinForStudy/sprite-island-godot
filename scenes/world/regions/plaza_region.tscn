@@ -14,12 +14,12 @@ position = Vector2(1020, 404)
 scale = Vector2(0.95, 0.95)
 
 [node name="WelcomeDecor" parent="." instance=ExtResource("2_plaza_decor")]
-position = Vector2(858, 500)
+position = Vector2(880, 470)
 
 [node name="LeftFlowerStone" parent="." instance=ExtResource("3_edge")]
-position = Vector2(610, 520)
+position = Vector2(590, 470)
 scale = Vector2(0.62, 0.62)
 
 [node name="RightFlowerStone" parent="." instance=ExtResource("3_edge")]
-position = Vector2(980, 532)
+position = Vector2(1080, 480)
 scale = Vector2(0.56, 0.56)

@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/world/props/grassland_decor_cluster.tscn" id="1_grassland_decor"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/pond_edge_cluster.tscn" id="2_edge"]
-[ext_resource type="PackedScene" path="res://scenes/world/props/tree_canopy_large.tscn" id="3_canopy"]
 
 [node name="GrasslandRegion" type="Node2D"]
 
@@ -13,14 +12,7 @@ position = Vector2(382, 238)
 position = Vector2(262, 188)
 scale = Vector2(0.78, 0.78)
 
-[node name="GrasslandDecorEast" parent="." instance=ExtResource("1_grassland_decor")]
-position = Vector2(510, 258)
-scale = Vector2(0.68, 0.68)
 
 [node name="StoneFlowerEdge" parent="." instance=ExtResource("2_edge")]
 position = Vector2(548, 212)
 scale = Vector2(0.58, 0.58)
-
-[node name="SoftCanopyHint" parent="." instance=ExtResource("3_canopy")]
-position = Vector2(248, 132)
-scale = Vector2(0.68, 0.68)

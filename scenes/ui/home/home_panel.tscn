@@ -1,0 +1,160 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/components/game_modal_shell.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/home/home_panel.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/icon_action_button.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/actions/action_feed.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/actions/action_clean.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/actions/action_interact.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/actions/action_rest.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/ui/backgrounds/home_interior_v1.png" id="8"]
+
+[node name="HomePanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2")
+
+[node name="RoomBackdrop" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
+visible = false
+
+[node name="ModalShell" parent="." instance=ExtResource("1")]
+visible = true
+title = "我的小屋"
+
+[node name="Dimmer" parent="ModalShell"]
+visible = true
+
+[node name="ModalPanel" parent="ModalShell/ModalCenter"]
+custom_minimum_size = Vector2(1080, 610)
+
+[node name="Layout" type="VBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="HomeContent" type="HBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="PartnerPanel" type="PanelContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PartnerPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="PartnerScroll" type="ScrollContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PartnerPanel/Margin"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PartnerList" type="VBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PartnerPanel/Margin/PartnerScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PetStage" type="PanelContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent"]
+custom_minimum_size = Vector2(390, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StageLayout" type="VBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PetStage"]
+layout_mode = 2
+alignment = 1
+
+[node name="Portrait" type="TextureRect" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PetStage/StageLayout"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PetName" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PetStage/StageLayout"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "欢迎回到小屋"
+horizontal_alignment = 1
+
+[node name="EmptyHint" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PetStage/StageLayout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.49, 0.39, 0.28, 1)
+theme_override_font_sizes/font_size = 16
+text = "去岛上探索，邀请第一位萌灵入住吧。"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Feedback" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/PetStage"]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+offset_top = 36.0
+offset_bottom = 70.0
+theme_override_colors/font_color = Color(0.37, 0.57, 0.22, 1)
+theme_override_font_sizes/font_size = 22
+text = "好感 +5"
+horizontal_alignment = 1
+
+[node name="StatsPanel" type="PanelContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent"]
+custom_minimum_size = Vector2(310, 0)
+layout_mode = 2
+
+[node name="StatsMargin" type="MarginContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/StatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Stats" type="VBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/StatsPanel/StatsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="StatsTitle" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/HomeContent/StatsPanel/StatsMargin/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "萌灵状态"
+
+[node name="Actions" type="HBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Feed" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Actions" instance=ExtResource("3")]
+layout_mode = 2
+caption = "喂食"
+action_icon = ExtResource("4")
+
+[node name="Clean" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Actions" instance=ExtResource("3")]
+layout_mode = 2
+caption = "清洁"
+action_icon = ExtResource("5")
+
+[node name="Pet" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Actions" instance=ExtResource("3")]
+layout_mode = 2
+caption = "摸摸"
+action_icon = ExtResource("6")
+
+[node name="Rest" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Actions" instance=ExtResource("3")]
+layout_mode = 2
+caption = "休息"
+action_icon = ExtResource("7")

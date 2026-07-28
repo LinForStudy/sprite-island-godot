@@ -47,13 +47,18 @@ const ELEMENT_COLORS: Dictionary = {
 
 const BASE_VIEW_SIZE: Vector2 = Vector2(1280.0, 720.0)
 const COMMAND_PANEL_HEIGHT: float = 205.0
+const STATUS_NORMAL_STYLE: StyleBox = preload("res://resources/themes/battle/battle_status_normal.tres")
+const STATUS_ACTIVE_STYLE: StyleBox = preload("res://resources/themes/battle/battle_status_active.tres")
+const SKILL_SELECTED_STYLE: StyleBox = preload("res://resources/themes/battle/battle_skill_selected.tres")
+const SKILL_DISABLED_STYLE: StyleBox = preload("res://resources/themes/battle/battle_skill_disabled.tres")
 const PLAYER_HOME_RATIO: Vector2 = Vector2(0.30, 0.65)
 const ENEMY_HOME_RATIO: Vector2 = Vector2(0.64, 0.40)
 
-@onready var battlefield_root: Node2D = $BattlefieldRoot
-@onready var field_mount: Node2D = $BattlefieldRoot/FieldMount
-@onready var player_spirit: BattleActor = $BattlefieldRoot/PlayerActor
-@onready var enemy_spirit: BattleActor = $BattlefieldRoot/EnemyActor
+@onready var battle_world: Node2D = $BattleWorld
+@onready var field_mount: Node2D = $BattleWorld/FieldMount
+@onready var player_spirit: BattleActor = $BattleWorld/PlayerActor
+@onready var enemy_spirit: BattleActor = $BattleWorld/EnemyActor
+@onready var effect_layer: Node2D = $BattleWorld/EffectLayer
 @onready var camera: Camera2D = $Camera2D
 
 @onready var battle_ui: Control = $CanvasLayer/BattleUI
@@ -64,8 +69,8 @@ const ENEMY_HOME_RATIO: Vector2 = Vector2(0.64, 0.40)
 @onready var player_guard_badge: Label = $CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerHeader/PlayerGuardBadge
 @onready var player_hp_bar: TextureProgressBar = $CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerHpRow/PlayerHpBar
 @onready var player_hp_value: Label = $CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerHpRow/PlayerHpValue
-@onready var player_energy_bar: TextureProgressBar = $CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerEnergyRow/PlayerEnergyBar
-@onready var player_energy_value: Label = $CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerEnergyRow/PlayerEnergyValue
+@onready var player_energy_bar: TextureProgressBar = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin/EnergyBox/EnergyBar
+@onready var player_energy_value: Label = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin/EnergyBox/EnergyHeader/EnergyValue
 
 @onready var enemy_status_card: PanelContainer = $CanvasLayer/BattleUI/EnemyStatusCard
 @onready var enemy_name_label: Label = $CanvasLayer/BattleUI/EnemyStatusCard/StatusMargin/StatusBox/EnemyHeader/EnemyName
@@ -76,11 +81,19 @@ const ENEMY_HOME_RATIO: Vector2 = Vector2(0.64, 0.40)
 
 @onready var command_panel: PanelContainer = $CanvasLayer/BattleUI/CommandPanel
 @onready var skill_grid: GridContainer = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid
+@onready var position_buttons: Array[Button] = [
+	$CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow/PositionLeft,
+	$CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow/PositionCenter,
+	$CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow/PositionRight
+]
 @onready var round_hint: Label = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/BattleInfo/RoundHint
 @onready var battle_log: Label = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/BattleInfo/BattleLog
-@onready var skill_description: Label = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/BattleInfo/SkillDescription
+@onready var skill_description: Label = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillDescriptionPanel/SkillDescriptionLine
 @onready var element_advantage: Label = $CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/BattleInfo/ElementAdvantage
-@onready var message_toast: Label = $CanvasLayer/BattleUI/MessageToast
+@onready var message_toast: PanelContainer = $CanvasLayer/BattleUI/MessageToast
+@onready var message_toast_text: Label = $CanvasLayer/BattleUI/MessageToast/Text
+@onready var turn_tip: PanelContainer = $CanvasLayer/BattleUI/TurnTip
+@onready var turn_tip_text: Label = $CanvasLayer/BattleUI/TurnTip/Text
 
 @onready var result_panel: PanelContainer = $CanvasLayer/BattleUI/ResultPanel
 @onready var result_title: Label = $CanvasLayer/BattleUI/ResultPanel/ResultMargin/ResultBox/ResultTitle
@@ -96,6 +109,7 @@ const ENEMY_HOME_RATIO: Vector2 = Vector2(0.64, 0.40)
 
 var skill_buttons: Array[Button] = []
 var _current_selected_skill: SpiritSkill
+var _selected_skill_index: int = -1
 var _exiting: bool = false
 var _loaded_habitat_id: String = ""
 var _last_intro_enemy_id: String = ""
@@ -125,8 +139,14 @@ func _ready() -> void:
 		button.pressed.connect(func() -> void: BattleManager.use_skill(skill_index))
 		button.mouse_entered.connect(func() -> void: _on_skill_hover(skill_index))
 		button.mouse_exited.connect(func() -> void: _on_skill_unhover())
+	for index in range(position_buttons.size()):
+		var position_slot: String = ["left", "center", "right"][index]
+		position_buttons[index].pressed.connect(func() -> void: BattleManager.choose_player_position(position_slot))
 	_apply_display_profile(DisplayManager.get_active_profile())
-	battle_presentation.setup(player_spirit, enemy_spirit, player_hp_bar, enemy_hp_bar, player_hp_value, enemy_hp_value, floating_text_layer)
+	battle_presentation.setup(player_spirit, enemy_spirit, player_hp_bar, enemy_hp_bar, player_hp_value, enemy_hp_value, floating_text_layer, effect_layer, camera)
+	for button in skill_buttons:
+		button.add_theme_stylebox_override("pressed", SKILL_SELECTED_STYLE)
+		button.add_theme_stylebox_override("disabled", SKILL_DISABLED_STYLE)
 	if not BattleManager.presentation_timed_out.is_connected(_on_presentation_timed_out):
 		BattleManager.presentation_timed_out.connect(_on_presentation_timed_out)
 	_refresh()
@@ -162,12 +182,16 @@ func _apply_world_layout() -> void:
 	if view_size.x <= 0.0 or view_size.y <= 0.0:
 		view_size = BASE_VIEW_SIZE
 	camera.position = view_size * 0.5
-	battlefield_root.position = Vector2.ZERO
-	player_spirit.set_home_position(Vector2(view_size.x * PLAYER_HOME_RATIO.x, view_size.y - COMMAND_PANEL_HEIGHT - 58.0))
+	battle_world.position = Vector2.ZERO
+	var slot: String = String(BattleManager.battle_state.get("player_position_slot", "center"))
+	var slot_offset: float = {"left": -96.0, "center": 0.0, "right": 96.0}.get(slot, 0.0)
+	player_spirit.set_home_position(Vector2(view_size.x * PLAYER_HOME_RATIO.x + slot_offset, view_size.y - COMMAND_PANEL_HEIGHT - 58.0))
 	enemy_spirit.set_home_position(Vector2(view_size.x * ENEMY_HOME_RATIO.x, view_size.y * ENEMY_HOME_RATIO.y))
 
 func _refresh() -> void:
 	_load_battlefield()
+	if not _is_presentation_playing():
+		_apply_world_layout()
 	var player_data: SpiritData = GameCatalog.get_spirit_by_id(String(BattleManager.battle_state.player_spirit_id))
 	var enemy_data: SpiritData = GameCatalog.get_spirit_by_id(String(BattleManager.battle_state.enemy_spirit_id))
 	if player_data == null or enemy_data == null:
@@ -211,9 +235,12 @@ func _refresh() -> void:
 	_refresh_battle_info(player_data, enemy_data)
 	_refresh_skill_buttons(player_data)
 	_refresh_result_panel()
+	_refresh_status_card_styles()
 	_try_start_presentation()
 
 func _refresh_battle_info(player_data: SpiritData, enemy_data: SpiritData) -> void:
+	turn_tip.visible = BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE or BattleManager.current_phase == BattleManager.BattlePhase.RESOLVING_ENEMY
+	turn_tip_text.text = "玩家回合" if BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE else "芽角鹿回合"
 	match BattleManager.current_phase:
 		BattleManager.BattlePhase.PLAYER_CHOOSE:
 			round_hint.text = "选一个技能吧"
@@ -273,7 +300,7 @@ func _show_intro_once(enemy_data: SpiritData) -> void:
 	if enemy_data.spirit_id == _last_intro_enemy_id:
 		return
 	_last_intro_enemy_id = enemy_data.spirit_id
-	message_toast.text = "野外的%s出现了！" % enemy_data.display_name
+	message_toast_text.text = "野外的%s出现了！" % enemy_data.display_name
 	message_toast.visible = true
 	message_toast.modulate.a = 1.0
 	if _toast_tween != null and _toast_tween.is_valid():
@@ -303,7 +330,7 @@ func _set_actor_texture(actor: BattleActor, spirit_id: String) -> void:
 		actor.set_spirit_texture(null)
 		return
 	var texture: Texture2D = load(path) as Texture2D
-	actor.set_spirit_texture(texture)
+	actor.set_spirit_id(spirit_id, texture)
 
 func _is_presentation_playing() -> bool:
 	return battle_presentation != null and battle_presentation.is_playing()
@@ -337,15 +364,27 @@ func _set_bar(bar: TextureProgressBar, value: int, max_value: int) -> void:
 	bar.max_value = max(1, max_value)
 	bar.value = clamp(value, 0, max_value)
 
+func _refresh_status_card_styles() -> void:
+	var player_active: bool = BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE
+	var enemy_active: bool = BattleManager.current_phase == BattleManager.BattlePhase.RESOLVING_ENEMY
+	player_status_card.add_theme_stylebox_override("panel", STATUS_ACTIVE_STYLE if player_active else STATUS_NORMAL_STYLE)
+	enemy_status_card.add_theme_stylebox_override("panel", STATUS_ACTIVE_STYLE if enemy_active else STATUS_NORMAL_STYLE)
+
 func _refresh_skill_buttons(player_data: SpiritData) -> void:
 	var can_act: bool = BattleManager.current_phase == BattleManager.BattlePhase.PLAYER_CHOOSE
+	var selected_slot: String = String(BattleManager.battle_state.get("player_position_slot", "center"))
+	for index in range(position_buttons.size()):
+		var slot: String = ["left", "center", "right"][index]
+		position_buttons[index].disabled = not can_act
+		position_buttons[index].button_pressed = slot == selected_slot
 	for index in range(skill_buttons.size()):
 		var button: Button = skill_buttons[index]
 		if index < player_data.skills.size():
 			var skill: SpiritSkill = player_data.skills[index]
 			button.visible = true
 			var display_name: String = skill.display_name if skill.display_name != "" else skill.skill_name
-			var subtitle: String = "%s · %s" % [_skill_role_label(skill.skill_role), _skill_type_label(skill.skill_type)]
+			var icons: Array[String] = ["💧", "💦", "🫧", "🌙"]
+			var subtitle: String = "%s  %s · %s" % [icons[index], _skill_role_label(skill.skill_role), _skill_type_label(skill.skill_type)]
 			if skill.power > 0:
 				subtitle += " · 威力%d" % skill.power
 			if skill.skill_role == "ultimate":
@@ -426,7 +465,7 @@ func _apply_display_profile(profile: DeviceProfile) -> void:
 	var ui_scale: float = profile.ui_scale if profile != null else 1.0
 	var font_scale: float = profile.font_scale if profile != null else 1.0
 	for button in skill_buttons:
-		button.custom_minimum_size = Vector2(194, 74) * ui_scale
+		button.custom_minimum_size = Vector2(194, 112) * ui_scale
 		button.add_theme_font_size_override("font_size", int(round(17 * font_scale)))
 	player_name_label.add_theme_font_size_override("font_size", int(round(20 * font_scale)))
 	player_level_label.add_theme_font_size_override("font_size", int(round(18 * font_scale)))
@@ -442,7 +481,7 @@ func _apply_display_profile(profile: DeviceProfile) -> void:
 	battle_log.add_theme_font_size_override("font_size", int(round(15 * font_scale)))
 	skill_description.add_theme_font_size_override("font_size", int(round(14 * font_scale)))
 	element_advantage.add_theme_font_size_override("font_size", int(round(14 * font_scale)))
-	message_toast.add_theme_font_size_override("font_size", int(round(26 * font_scale)))
+	message_toast_text.add_theme_font_size_override("font_size", int(round(22 * font_scale)))
 	result_title.add_theme_font_size_override("font_size", int(round(30 * font_scale)))
 	result_summary.add_theme_font_size_override("font_size", int(round(21 * font_scale)))
 	capture_label.add_theme_font_size_override("font_size", int(round(21 * font_scale)))

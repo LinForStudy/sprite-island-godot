@@ -1,9 +1,19 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/battle_scene.gd" id="1_script"]
 [ext_resource type="Theme" path="res://resources/themes/cozy_theme.tres" id="2_theme"]
 [ext_resource type="PackedScene" path="res://scenes/battle/battle_actor.tscn" id="3_actor_scene"]
 [ext_resource type="Script" path="res://scripts/battle/battle_presentation.gd" id="4_presentation_script"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_status_normal.tres" id="5_status_normal"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_status_active.tres" id="6_status_active"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_command_panel.tres" id="7_command"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_energy_panel.tres" id="8_energy"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_skill_normal.tres" id="9_skill_normal"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_skill_focused.tres" id="10_skill_focused"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_skill_selected.tres" id="11_skill_selected"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_skill_disabled.tres" id="12_skill_disabled"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_action_banner.tres" id="13_action_banner"]
+[ext_resource type="StyleBox" path="res://resources/themes/battle/battle_skill_description.tres" id="14_skill_description"]
 
 [sub_resource type="Gradient" id="HpBarGradient"]
 colors = PackedColorArray(0.470588, 0.721569, 0.290196, 1, 0.545098, 0.788235, 0.360784, 1)
@@ -54,19 +64,19 @@ content_margin_bottom = 8.0
 [node name="BattleScene" type="Node2D"]
 script = ExtResource("1_script")
 
-[node name="BattlefieldRoot" type="Node2D" parent="."]
+[node name="BattleWorld" type="Node2D" parent="."]
 
-[node name="FieldMount" type="Node2D" parent="BattlefieldRoot"]
+[node name="FieldMount" type="Node2D" parent="BattleWorld"]
 
-[node name="PlayerActor" parent="BattlefieldRoot" instance=ExtResource("3_actor_scene")]
+[node name="PlayerActor" parent="BattleWorld" instance=ExtResource("3_actor_scene")]
 position = Vector2(384, 457)
 z_index = 20
 
-[node name="EnemyActor" parent="BattlefieldRoot" instance=ExtResource("3_actor_scene")]
+[node name="EnemyActor" parent="BattleWorld" instance=ExtResource("3_actor_scene")]
 position = Vector2(819, 288)
 z_index = 18
 
-[node name="EffectLayer" type="Node2D" parent="BattlefieldRoot"]
+[node name="EffectLayer" type="Node2D" parent="BattleWorld"]
 z_index = 80
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -87,18 +97,19 @@ theme = ExtResource("2_theme")
 
 [node name="PlayerStatusCard" type="PanelContainer" parent="CanvasLayer/BattleUI"]
 layout_mode = 1
+theme_override_styles/panel = ExtResource("5_status_normal")
 anchors_preset = 0
 offset_left = 24.0
-offset_top = 24.0
-offset_right = 338.0
-offset_bottom = 150.0
+offset_top = 20.0
+offset_right = 336.0
+offset_bottom = 124.0
 
 [node name="StatusMargin" type="MarginContainer" parent="CanvasLayer/BattleUI/PlayerStatusCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 12
 
 [node name="StatusBox" type="VBoxContainer" parent="CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin"]
 layout_mode = 2
@@ -151,47 +162,24 @@ texture_progress = SubResource("HpBarTexture")
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 
-[node name="PlayerEnergyRow" type="HBoxContainer" parent="CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="PlayerEnergyLabel" type="Label" parent="CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerEnergyRow"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "大招能量"
-
-[node name="PlayerEnergyBar" type="TextureProgressBar" parent="CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerEnergyRow"]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
-size_flags_horizontal = 3
-nine_patch_stretch = true
-stretch_margin_left = 4
-stretch_margin_top = 4
-stretch_margin_right = 4
-stretch_margin_bottom = 4
-texture_progress = SubResource("EnergyBarTexture")
-
-[node name="PlayerEnergyValue" type="Label" parent="CanvasLayer/BattleUI/PlayerStatusCard/StatusMargin/StatusBox/PlayerEnergyRow"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-
 [node name="EnemyStatusCard" type="PanelContainer" parent="CanvasLayer/BattleUI"]
 layout_mode = 1
+theme_override_styles/panel = ExtResource("5_status_normal")
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -366.0
-offset_top = 24.0
+offset_left = -336.0
+offset_top = 20.0
 offset_right = -24.0
-offset_bottom = 132.0
+offset_bottom = 124.0
 grow_horizontal = 0
 
 [node name="StatusMargin" type="MarginContainer" parent="CanvasLayer/BattleUI/EnemyStatusCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 12
 
 [node name="StatusBox" type="VBoxContainer" parent="CanvasLayer/BattleUI/EnemyStatusCard/StatusMargin"]
 layout_mode = 2
@@ -240,6 +228,7 @@ theme_override_font_sizes/font_size = 15
 
 [node name="CommandPanel" type="PanelContainer" parent="CanvasLayer/BattleUI"]
 layout_mode = 1
+theme_override_styles/panel = ExtResource("7_command")
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -262,11 +251,82 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 16
 
+[node name="EnergyDisplay" type="PanelContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody"]
+custom_minimum_size = Vector2(176, 112)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("8_energy")
+
+[node name="EnergyMargin" type="MarginContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="EnergyBox" type="VBoxContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EnergyHeader" type="HBoxContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin/EnergyBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EnergyIcon" type="Label" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin/EnergyBox/EnergyHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.329412, 0.682353, 0.866667, 1)
+theme_override_font_sizes/font_size = 20
+text = "💧"
+
+[node name="EnergyLabel" type="Label" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin/EnergyBox/EnergyHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "能量"
+
+[node name="EnergyValue" type="Label" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin/EnergyBox/EnergyHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+
+[node name="EnergyBar" type="TextureProgressBar" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/EnergyDisplay/EnergyMargin/EnergyBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+texture_progress = SubResource("EnergyBarTexture")
 [node name="SkillArea" type="VBoxContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="PositionLabel" type="Label" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.470588, 0.4, 0.313725, 1)
+theme_override_font_sizes/font_size = 15
+text = "选择站位"
+
+[node name="PositionRow" type="HBoxContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PositionLeft" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow"]
+custom_minimum_size = Vector2(96, 44)
+toggle_mode = true
+layout_mode = 2
+text = "左侧"
+
+[node name="PositionCenter" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow"]
+custom_minimum_size = Vector2(96, 44)
+toggle_mode = true
+layout_mode = 2
+text = "中央"
+
+[node name="PositionRight" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/PositionRow"]
+custom_minimum_size = Vector2(96, 44)
+toggle_mode = true
+layout_mode = 2
+text = "右侧"
 [node name="SkillLabel" type="Label" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea"]
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.470588, 0.4, 0.313725, 1)
 theme_override_font_sizes/font_size = 15
@@ -274,51 +334,56 @@ text = "选择技能"
 
 [node name="SkillGrid" type="GridContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea"]
 layout_mode = 2
-columns = 2
-theme_override_constants/h_separation = 10
+columns = 4
+theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
 [node name="SkillButton0" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(194, 74)
+custom_minimum_size = Vector2(244, 112)
 layout_mode = 2
-theme_override_styles/normal = SubResource("SkillButtonNormal")
-theme_override_styles/hover = SubResource("SkillButtonHover")
+theme_override_styles/normal = ExtResource("9_skill_normal")
+theme_override_styles/hover = ExtResource("10_skill_focused")
 theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
-theme_override_colors/font_hover_color = Color(0.964706, 0.933333, 0.862745, 1)
+theme_override_colors/font_hover_color = Color(0.290196, 0.231373, 0.172549, 1)
+theme_override_colors/font_disabled_color = Color(0.458824, 0.270588, 0.172549, 1)
 theme_override_font_sizes/font_size = 17
 text = "技能"
 
 [node name="SkillButton1" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(194, 74)
+custom_minimum_size = Vector2(244, 112)
 layout_mode = 2
-theme_override_styles/normal = SubResource("SkillButtonNormal")
-theme_override_styles/hover = SubResource("SkillButtonHover")
+theme_override_styles/normal = ExtResource("9_skill_normal")
+theme_override_styles/hover = ExtResource("10_skill_focused")
 theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
-theme_override_colors/font_hover_color = Color(0.964706, 0.933333, 0.862745, 1)
+theme_override_colors/font_hover_color = Color(0.290196, 0.231373, 0.172549, 1)
+theme_override_colors/font_disabled_color = Color(0.458824, 0.270588, 0.172549, 1)
 theme_override_font_sizes/font_size = 17
 text = "技能"
 
 [node name="SkillButton2" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(194, 74)
+custom_minimum_size = Vector2(244, 112)
 layout_mode = 2
-theme_override_styles/normal = SubResource("SkillButtonNormal")
-theme_override_styles/hover = SubResource("SkillButtonHover")
+theme_override_styles/normal = ExtResource("9_skill_normal")
+theme_override_styles/hover = ExtResource("10_skill_focused")
 theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
-theme_override_colors/font_hover_color = Color(0.964706, 0.933333, 0.862745, 1)
+theme_override_colors/font_hover_color = Color(0.290196, 0.231373, 0.172549, 1)
+theme_override_colors/font_disabled_color = Color(0.458824, 0.270588, 0.172549, 1)
 theme_override_font_sizes/font_size = 17
 text = "技能"
 
 [node name="SkillButton3" type="Button" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillGrid"]
-custom_minimum_size = Vector2(194, 74)
+custom_minimum_size = Vector2(244, 112)
 layout_mode = 2
-theme_override_styles/normal = SubResource("SkillButtonNormal")
-theme_override_styles/hover = SubResource("SkillButtonHover")
+theme_override_styles/normal = ExtResource("9_skill_normal")
+theme_override_styles/hover = ExtResource("10_skill_focused")
 theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
-theme_override_colors/font_hover_color = Color(0.964706, 0.933333, 0.862745, 1)
+theme_override_colors/font_hover_color = Color(0.290196, 0.231373, 0.172549, 1)
+theme_override_colors/font_disabled_color = Color(0.458824, 0.270588, 0.172549, 1)
 theme_override_font_sizes/font_size = 17
 text = "技能"
 
 [node name="BattleInfo" type="VBoxContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
@@ -349,19 +414,54 @@ theme_override_colors/font_color = Color(0.470588, 0.721569, 0.290196, 1)
 theme_override_font_sizes/font_size = 14
 text = ""
 
-[node name="MessageToast" type="Label" parent="CanvasLayer/BattleUI"]
+[node name="SkillDescriptionPanel" type="PanelContainer" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("14_skill_description")
+
+[node name="SkillDescriptionLine" type="Label" parent="CanvasLayer/BattleUI/CommandPanel/CommandMargin/CommandBody/SkillArea/SkillDescriptionPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
+theme_override_font_sizes/font_size = 14
+text_overrun_behavior = 3
+vertical_alignment = 1
+[node name="TurnTip" type="PanelContainer" parent="CanvasLayer/BattleUI"]
 visible = false
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 158.0
-offset_bottom = 200.0
+offset_left = 452.0
+offset_top = 112.0
+offset_right = -452.0
+offset_bottom = 158.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_styles/panel = ExtResource("8_energy")
+
+[node name="Text" type="Label" parent="CanvasLayer/BattleUI/TurnTip"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+vertical_alignment = 1
+[node name="MessageToast" type="PanelContainer" parent="CanvasLayer/BattleUI"]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 388.0
+offset_top = 160.0
+offset_right = -388.0
+offset_bottom = 210.0
+grow_horizontal = 2
+theme_override_styles/panel = ExtResource("13_action_banner")
+
+[node name="Text" type="Label" parent="CanvasLayer/BattleUI/MessageToast"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.952941, 0.976471, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "野外的暖尾狐出现了！"
 horizontal_alignment = 1
-
+vertical_alignment = 1
 [node name="FloatingTextLayer" type="Control" parent="CanvasLayer/BattleUI"]
 layout_mode = 1
 anchors_preset = 15

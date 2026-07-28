@@ -10,11 +10,11 @@
 position = Vector2(180, 544)
 
 [node name="PondEdgeWest" parent="." instance=ExtResource("1_edge")]
-position = Vector2(96, 626)
+position = Vector2(132, 620)
 scale = Vector2(0.82, 0.82)
 
 [node name="PondEdgeSouth" parent="." instance=ExtResource("1_edge")]
-position = Vector2(248, 676)
+position = Vector2(270, 682)
 scale = Vector2(0.74, 0.74)
 
 [node name="PondTree" parent="." instance=ExtResource("2_tree")]
@@ -22,5 +22,5 @@ position = Vector2(356, 640)
 scale = Vector2(0.9, 0.9)
 
 [node name="PondRoute" parent="." instance=ExtResource("3_route")]
-position = Vector2(320, 590)
+position = Vector2(382, 596)
 scale = Vector2(0.84, 0.84)

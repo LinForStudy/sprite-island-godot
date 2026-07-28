@@ -41,6 +41,29 @@ func get_captured_spirit_ids() -> Array[String]:
 	ids.sort()
 	return ids
 
+func is_habitat_unlocked(habitat_id: String) -> bool:
+	return bool(Dictionary(save_data.get("unlocked_habitats", {"grassland": true})).get(habitat_id, false))
+
+func unlock_habitat(habitat_id: String) -> bool:
+	var unlocked: Dictionary = Dictionary(save_data.get("unlocked_habitats", {"grassland": true}))
+	if bool(unlocked.get(habitat_id, false)):
+		return false
+	unlocked[habitat_id] = true
+	save_data["unlocked_habitats"] = unlocked
+	save_now()
+	return true
+
+func get_tutorial_progress() -> Dictionary:
+	return Dictionary(save_data.get("tutorial_progress", {}))
+
+func set_tutorial_flag(flag: String) -> void:
+	var progress: Dictionary = get_tutorial_progress()
+	if bool(progress.get(flag, false)):
+		return
+	progress[flag] = true
+	save_data["tutorial_progress"] = progress
+	save_now()
+
 func mark_discovered(spirit_id: String) -> void:
 	if has_discovered(spirit_id):
 		return
@@ -61,6 +84,10 @@ func capture_spirit(spirit: SpiritData) -> bool:
 		"exp": 0,
 		"current_hp": int(stats.hp)
 	}
+	if get_captured_spirit_ids().size() >= 1:
+		unlock_habitat("pond")
+	if get_captured_spirit_ids().size() >= 2:
+		unlock_habitat("warmstone")
 	save_now()
 	return true
 
@@ -91,17 +118,20 @@ func care_for(spirit: SpiritData, action: String) -> String:
 			pet.current_hp = min(max_hp, int(pet.current_hp) + 5)
 			pet.mood = "full"
 			update_pet_state(spirit.spirit_id, pet)
+			unlock_habitat("warmstone")
 			return "%s开心地吃了%s。" % [spirit.display_name, spirit.favorite_food]
 		"clean":
 			pet.cleanliness = min(100, int(pet.cleanliness) + 22)
 			pet.affection = min(100, int(pet.affection) + 4)
 			pet.mood = "clean"
 			update_pet_state(spirit.spirit_id, pet)
+			unlock_habitat("warmstone")
 			return "%s变得干干净净啦。" % spirit.display_name
 		"pet":
 			pet.affection = min(100, int(pet.affection) + 12)
 			pet.mood = "close"
 			update_pet_state(spirit.spirit_id, pet)
+			unlock_habitat("warmstone")
 			return "%s更喜欢你了。" % spirit.display_name
 	return ""
 
@@ -132,7 +162,9 @@ func _default_save_data() -> Dictionary:
 		"last_saved_at": Time.get_datetime_string_from_system(false, true),
 		"discovered": {},
 		"captured": {},
-		"exploration_streak": {}
+		"exploration_streak": {},
+		"unlocked_habitats": {"grassland": true},
+		"tutorial_progress": {}
 	}
 
 func _normalize_save_data(raw: Dictionary) -> Dictionary:
@@ -141,8 +173,15 @@ func _normalize_save_data(raw: Dictionary) -> Dictionary:
 		"last_saved_at": String(raw.get("last_saved_at", Time.get_datetime_string_from_system(false, true))),
 		"discovered": Dictionary(raw.get("discovered", {})),
 		"captured": Dictionary(raw.get("captured", {})),
-		"exploration_streak": Dictionary(raw.get("exploration_streak", {}))
+		"exploration_streak": Dictionary(raw.get("exploration_streak", {})),
+		"unlocked_habitats": _normalize_unlocked_habitats(Dictionary(raw.get("unlocked_habitats", {}))),
+		"tutorial_progress": Dictionary(raw.get("tutorial_progress", {}))
 	}
+
+func _normalize_unlocked_habitats(raw: Dictionary) -> Dictionary:
+	var unlocked: Dictionary = raw.duplicate()
+	unlocked["grassland"] = true
+	return unlocked
 
 func _has_progress(candidate: Dictionary) -> bool:
 	return not Dictionary(candidate.get("discovered", {})).is_empty() or not Dictionary(candidate.get("captured", {})).is_empty()

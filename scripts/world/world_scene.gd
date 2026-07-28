@@ -13,6 +13,8 @@ const VISUAL_SOURCE_GRASSLAND_1 = 5
 const VISUAL_SOURCE_GRASSLAND_2 = 6
 const VISUAL_SOURCE_TALL_GRASS = 7
 const VISUAL_SOURCE_GRASS_EDGE = 8
+const VISUAL_SOURCE_WATER = 9
+const VISUAL_SOURCE_WARM_SOIL = 10
 const VISUAL_TILE := Vector2i(0, 0)
 const TILE_GRASS := Vector2i(0, 0)
 const TILE_ROAD := Vector2i(1, 0)
@@ -36,6 +38,8 @@ const HABITAT_POINT_SCENE := preload("res://scenes/world/habitat_point.tscn")
 @export var default_spawn_id: String = "entry_default"
 
 @onready var visual_ground_layer: TileMapLayer = get_node_or_null("VisualGroundLayer") as TileMapLayer
+@onready var visual_path_layer: TileMapLayer = get_node_or_null("PathLayer") as TileMapLayer
+@onready var visual_detail_layer: TileMapLayer = get_node_or_null("GroundDetailLayer") as TileMapLayer
 @onready var ground_layer: TileMapLayer = $GroundLayer
 @onready var decoration_layer: TileMapLayer = $DecorationLayer
 @onready var collision_layer: TileMapLayer = $CollisionLayer
@@ -44,19 +48,22 @@ const HABITAT_POINT_SCENE := preload("res://scenes/world/habitat_point.tscn")
 @onready var collision_geometry: Node2D = $CollisionGeometry
 @onready var habitat_points_root: Node2D = $HabitatPoints
 @onready var spawn_points: Node2D = $SpawnPoints
-@onready var player: Node = $Player
+@onready var player: Node = get_node_or_null("YSortEntities/Player") if get_node_or_null("YSortEntities/Player") != null else get_node_or_null("Player")
 @onready var camera_controller: Camera2D = $CameraController
 @onready var dialogue_ui: Node = $DialogueUI
 @onready var gameplay_ui: Node = $GameplayUI
 
 var map_size: Vector2i = Vector2i(96, 54)
+var interaction_prompt_candidates: Array[Area2D] = []
 
 func _ready() -> void:
 	WorldState.register_scene(scene_id)
 	_build_map()
+	_build_visual_blockers()
 	_hide_helper_layers()
 	_spawn_habitat_points()
 	_place_player()
+	_bind_world_interaction_prompt()
 	_sync_camera_limits()
 	_validate_scene_setup()
 
@@ -82,6 +89,10 @@ func _build_map() -> void:
 func _clear_layers() -> void:
 	if visual_ground_layer != null:
 		visual_ground_layer.clear()
+	if visual_path_layer != null:
+		visual_path_layer.clear()
+	if visual_detail_layer != null:
+		visual_detail_layer.clear()
 	ground_layer.clear()
 	decoration_layer.clear()
 	collision_layer.clear()
@@ -89,6 +100,35 @@ func _clear_layers() -> void:
 	foreground_layer.clear()
 	for child in collision_geometry.get_children():
 		child.queue_free()
+
+func _build_visual_blockers() -> void:
+	# Visible props are separate from the placeholder TileMap collision layer.
+	# These coarse base shapes make trees, rocks, the pond and fenced yard read as route boundaries.
+	_add_visual_blocker(Vector2(500, 402), Vector2(42, 24), "PlazaTreeWestBlocker")
+	_add_visual_blocker(Vector2(1020, 416), Vector2(42, 24), "PlazaTreeEastBlocker")
+	_add_visual_blocker(Vector2(356, 652), Vector2(38, 22), "PondTreeBlocker")
+	_add_visual_blocker(Vector2(1326, 142), Vector2(40, 24), "WarmTreeBlocker")
+	_add_visual_blocker(Vector2(210, 676), Vector2(38, 22), "HomeTreeBlocker")
+	_add_visual_blocker(Vector2(590, 476), Vector2(34, 20), "PlazaStoneWestBlocker")
+	_add_visual_blocker(Vector2(1080, 486), Vector2(32, 20), "PlazaStoneEastBlocker")
+	_add_visual_blocker(Vector2(1168, 278), Vector2(56, 38), "WarmStoneMainBlocker")
+	_add_visual_blocker(Vector2(1260, 234), Vector2(42, 30), "WarmStoneSideBlocker")
+	_add_visual_blocker(Vector2(238, 586), Vector2(140, 82), "PondWaterBlocker")
+	_add_visual_blocker(Vector2(268, 730), Vector2(70, 12), "HomeFenceWestBlocker")
+	_add_visual_blocker(Vector2(452, 730), Vector2(70, 12), "HomeFenceEastBlocker")
+
+func _add_visual_blocker(center: Vector2, size: Vector2, blocker_name: String) -> void:
+	var body: StaticBody2D = StaticBody2D.new()
+	var shape: CollisionShape2D = CollisionShape2D.new()
+	var rectangle: RectangleShape2D = RectangleShape2D.new()
+	rectangle.size = size
+	shape.shape = rectangle
+	body.name = blocker_name
+	body.position = center
+	body.collision_layer = 2
+	body.collision_mask = 0
+	body.add_child(shape)
+	collision_geometry.add_child(body)
 
 func _hide_helper_layers() -> void:
 	# All TileMapLayers using world_tiles.tres render placeholder coloured
@@ -201,51 +241,98 @@ func _build_test_world() -> void:
 func _build_wind_plaza_visual_ground() -> void:
 	if visual_ground_layer == null:
 		return
+	# One calm grass family is the map foundation. Variants stay isolated so
+	# the terrain reads as natural detail instead of rectangular zones.
 	for x in range(24):
 		for y in range(14):
-			var source_id: int = VISUAL_SOURCE_GRASS_1
-			var pattern_index: int = (x * 3 + y * 5) % 6
-			if pattern_index == 1 or pattern_index == 4:
-				source_id = VISUAL_SOURCE_GRASS_2
-			elif pattern_index == 2:
-				source_id = VISUAL_SOURCE_GRASS_3
-			_set_visual_tile(Vector2i(x, y), source_id)
+			_set_visual_ground_tile(Vector2i(x, y), VISUAL_SOURCE_GRASS_1)
+	for cell in [
+		Vector2i(1, 1), Vector2i(4, 8), Vector2i(8, 1), Vector2i(14, 2),
+		Vector2i(18, 6), Vector2i(22, 3), Vector2i(2, 12), Vector2i(16, 12)
+	]:
+		_set_visual_ground_tile(cell, VISUAL_SOURCE_GRASS_2)
 
-	_fill_visual_rect(Rect2i(10, 5, 4, 3), VISUAL_SOURCE_PLAZA)
-	_fill_visual_rect(Rect2i(9, 5, 2, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(8, 4, 2, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(7, 3, 2, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(8, 7, 3, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(7, 8, 1, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(5, 9, 3, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(13, 5, 3, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(15, 4, 1, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(15, 3, 3, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(11, 7, 1, 3), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(8, 9, 4, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(6, 11, 3, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(13, 7, 3, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(15, 8, 1, 2), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(16, 9, 3, 1), VISUAL_SOURCE_ROAD)
-	_fill_visual_rect(Rect2i(18, 10, 4, 1), VISUAL_SOURCE_ROAD)
+	# Central activity space: a compact, readable plaza with low visual noise.
+	_fill_visual_rect(Rect2i(10, 6, 4, 3), VISUAL_SOURCE_PLAZA)
+
+	# North-west branch to the grassland habitat. Two-tile-wide stepped bends
+	# avoid the previous hard cross-road and keep a consistent walking width.
+	_fill_visual_rect(Rect2i(8, 5, 4, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(7, 4, 3, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(5, 3, 4, 2), VISUAL_SOURCE_ROAD)
+
+	# South-west branch to the cottage yard.
+	_fill_visual_rect(Rect2i(8, 8, 4, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(7, 9, 3, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(5, 10, 4, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(4, 11, 3, 2), VISUAL_SOURCE_ROAD)
+
+	# South-east branch to the existing scene exit.
+	_fill_visual_rect(Rect2i(13, 8, 4, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(15, 9, 4, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(17, 10, 5, 2), VISUAL_SOURCE_ROAD)
+	_fill_visual_rect(Rect2i(20, 11, 4, 2), VISUAL_SOURCE_ROAD)
+
+	# Sparse transition tiles soften only selected outside bends. They avoid a
+	# continuous dark outline while breaking the remaining hard tile corners.
+	for cell in [
+		Vector2i(7, 6), Vector2i(6, 5), Vector2i(4, 4), Vector2i(9, 3),
+		Vector2i(9, 10), Vector2i(6, 9), Vector2i(4, 10), Vector2i(3, 11), Vector2i(7, 12),
+		Vector2i(14, 10), Vector2i(16, 11), Vector2i(19, 12), Vector2i(22, 10), Vector2i(23, 13)
+	]:
+		_set_visual_tile(cell, VISUAL_SOURCE_GRASS_EDGE)
+
 	_build_grassland_visual_ground()
+	_build_pond_visual_ground()
+	_build_warmstone_visual_ground()
 
 func _build_grassland_visual_ground() -> void:
-	_fill_visual_rect(Rect2i(3, 2, 5, 4), VISUAL_SOURCE_GRASSLAND_1)
-	_fill_visual_rect(Rect2i(5, 3, 4, 3), VISUAL_SOURCE_GRASSLAND_2)
-	_fill_visual_rect(Rect2i(4, 5, 4, 2), VISUAL_SOURCE_TALL_GRASS)
-	_fill_visual_rect(Rect2i(7, 4, 2, 2), VISUAL_SOURCE_TALL_GRASS)
-	_fill_visual_rect(Rect2i(6, 3, 2, 1), VISUAL_SOURCE_GRASS_EDGE)
-	_fill_visual_rect(Rect2i(8, 5, 1, 2), VISUAL_SOURCE_GRASS_EDGE)
-func _set_visual_tile(cell: Vector2i, source_id: int) -> void:
+	# Deep grass is restricted to the habitat and forest edge. The irregular
+	# footprint replaces the old horizontal bands that cut across the screen.
+	for cell in [
+		Vector2i(3, 2), Vector2i(4, 2), Vector2i(5, 2), Vector2i(6, 2),
+		Vector2i(2, 3), Vector2i(3, 3), Vector2i(4, 3), Vector2i(6, 3),
+		Vector2i(2, 4), Vector2i(3, 4), Vector2i(4, 4),
+		Vector2i(3, 5), Vector2i(4, 5)
+	]:
+		_set_visual_tile(cell, VISUAL_SOURCE_GRASSLAND_1)
+	for cell in [Vector2i(3, 3), Vector2i(4, 3), Vector2i(3, 4), Vector2i(4, 4)]:
+		_set_visual_tile(cell, VISUAL_SOURCE_TALL_GRASS)
+	for cell in [Vector2i(5, 2), Vector2i(5, 3), Vector2i(4, 5)]:
+		_set_visual_tile(cell, VISUAL_SOURCE_GRASS_EDGE)
+func _build_pond_visual_ground() -> void:
+	for cell in [
+		Vector2i(2, 8), Vector2i(3, 8), Vector2i(4, 8), Vector2i(5, 8),
+		Vector2i(2, 9), Vector2i(3, 9), Vector2i(4, 9), Vector2i(5, 9),
+		Vector2i(3, 10), Vector2i(4, 10)
+	]:
+		_set_visual_tile(cell, VISUAL_SOURCE_WATER)
+
+func _build_warmstone_visual_ground() -> void:
+	for cell in [
+		Vector2i(17, 3), Vector2i(18, 3), Vector2i(19, 3),
+		Vector2i(17, 4), Vector2i(18, 4), Vector2i(19, 4), Vector2i(20, 4),
+		Vector2i(18, 5), Vector2i(19, 5), Vector2i(20, 5)
+	]:
+		_set_visual_tile(cell, VISUAL_SOURCE_WARM_SOIL)
+
+func _set_visual_ground_tile(cell: Vector2i, source_id: int) -> void:
 	if visual_ground_layer == null:
 		return
 	visual_ground_layer.set_cell(cell, source_id, VISUAL_TILE, 0)
 
+func _set_visual_tile(cell: Vector2i, source_id: int) -> void:
+	if visual_detail_layer == null:
+		return
+	visual_detail_layer.set_cell(cell, source_id, VISUAL_TILE, 0)
+
 func _fill_visual_rect(rect: Rect2i, source_id: int) -> void:
+	if visual_path_layer == null:
+		return
 	for x in range(rect.position.x, rect.end.x):
 		for y in range(rect.position.y, rect.end.y):
-			_set_visual_tile(Vector2i(x, y), source_id)
+			visual_path_layer.set_cell(Vector2i(x, y), source_id, VISUAL_TILE, 0)
+
 func _build_grove_gate() -> void:
 	map_size = Vector2i(96, 54)
 	_fill_rect(ground_layer, Rect2i(0, 0, map_size.x, map_size.y), TILE_GRASS)
@@ -372,6 +459,61 @@ func _place_player() -> void:
 	camera_controller.global_position = player_position
 	var facing: String = str(player.call("get_facing_direction"))
 	WorldState.remember_player_state(player_position, facing)
+
+func _bind_world_interaction_prompt() -> void:
+	var interaction_area: Area2D = player.get_node_or_null("InteractionArea") as Area2D
+	if interaction_area == null:
+		return
+	if not interaction_area.area_entered.is_connected(_on_prompt_area_entered):
+		interaction_area.area_entered.connect(_on_prompt_area_entered)
+	if not interaction_area.area_exited.is_connected(_on_prompt_area_exited):
+		interaction_area.area_exited.connect(_on_prompt_area_exited)
+	if not GameState.ui_state_changed.is_connected(_on_world_ui_state_changed):
+		GameState.ui_state_changed.connect(_on_world_ui_state_changed)
+	for area in interaction_area.get_overlapping_areas():
+		_on_prompt_area_entered(area)
+	_refresh_world_interaction_prompt()
+
+func _on_prompt_area_entered(area: Area2D) -> void:
+	if area.is_in_group("interactable") and not interaction_prompt_candidates.has(area):
+		interaction_prompt_candidates.append(area)
+	_refresh_world_interaction_prompt()
+
+func _on_prompt_area_exited(area: Area2D) -> void:
+	interaction_prompt_candidates.erase(area)
+	_refresh_world_interaction_prompt()
+
+func _on_world_ui_state_changed(_panel: String) -> void:
+	_refresh_world_interaction_prompt()
+
+func _refresh_world_interaction_prompt() -> void:
+	if gameplay_ui == null or not gameplay_ui.has_method("hide_interaction_prompt"):
+		return
+	for index in range(interaction_prompt_candidates.size() - 1, -1, -1):
+		if not is_instance_valid(interaction_prompt_candidates[index]):
+			interaction_prompt_candidates.remove_at(index)
+	if GameState.current_panel != "hud" or interaction_prompt_candidates.is_empty():
+		gameplay_ui.call("hide_interaction_prompt")
+		return
+	var closest: Area2D = null
+	var best_distance: float = INF
+	for candidate in interaction_prompt_candidates:
+		var distance: float = (player as Node2D).global_position.distance_to(candidate.global_position)
+		if distance < best_distance:
+			best_distance = distance
+			closest = candidate
+	if closest != null and gameplay_ui.has_method("show_interaction_prompt"):
+		gameplay_ui.call("show_interaction_prompt", _interaction_prompt_text(closest))
+
+func _interaction_prompt_text(area: Area2D) -> String:
+	var script_path: String = area.get_script().resource_path if area.get_script() != null else ""
+	if script_path.ends_with("habitat_point.gd"):
+		return "开始探索"
+	if script_path.ends_with("home_entry.gd"):
+		return "进入小屋"
+	if script_path.ends_with("TestNpc.gd"):
+		return "与村民交谈"
+	return "互动"
 
 func _sync_camera_limits() -> void:
 	var limit_right: int = map_size.x * 16

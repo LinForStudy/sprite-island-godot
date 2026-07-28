@@ -7,12 +7,12 @@
 [node name="ExitRegion" type="Node2D"]
 
 [node name="RouteSign" parent="." instance=ExtResource("1_route")]
-position = Vector2(1352, 668)
+position = Vector2(1348, 650)
 
 [node name="RoadsideTree" parent="." instance=ExtResource("2_tree")]
-position = Vector2(1226, 734)
+position = Vector2(1248, 674)
 scale = Vector2(0.84, 0.84)
 
 [node name="RoadsideDecor" parent="." instance=ExtResource("3_edge")]
-position = Vector2(1424, 744)
+position = Vector2(1420, 690)
 scale = Vector2(0.7, 0.7)

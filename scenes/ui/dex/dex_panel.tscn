@@ -1,0 +1,136 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/components/game_modal_shell.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/dex/dex_panel.gd" id="2"]
+
+[node name="DexPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2")
+
+[node name="BookBackdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0, 0.0, 0.0, 0.0)
+
+[node name="ModalShell" parent="." instance=ExtResource("1")]
+visible = true
+title = "萌灵图鉴"
+
+[node name="Dimmer" parent="ModalShell"]
+visible = true
+
+[node name="ModalPanel" parent="ModalShell/ModalCenter"]
+custom_minimum_size = Vector2(1080, 610)
+
+[node name="Layout" type="VBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="Filters" type="HBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="All" type="Button" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters"]
+custom_minimum_size = Vector2(84, 42)
+layout_mode = 2
+text = "全部"
+
+[node name="Residents" type="Button" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters"]
+custom_minimum_size = Vector2(84, 42)
+layout_mode = 2
+text = "已入住"
+
+[node name="Discovered" type="Button" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters"]
+custom_minimum_size = Vector2(84, 42)
+layout_mode = 2
+text = "已发现"
+
+[node name="Unknown" type="Button" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters"]
+custom_minimum_size = Vector2(84, 42)
+layout_mode = 2
+text = "未发现"
+
+[node name="Progress" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/Filters"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.48, 0.38, 0.27, 1)
+theme_override_font_sizes/font_size = 16
+text = "已发现 0 / 0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="DexContent" type="HBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="Catalog" type="VBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Hint" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Catalog"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.38, 0.27, 1)
+theme_override_font_sizes/font_size = 16
+text = "选择一只萌灵查看详情"
+
+[node name="Scroll" type="ScrollContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Catalog"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SpiritGrid" type="GridContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Catalog/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="Detail" type="PanelContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Margin" type="MarginContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Detail"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="DetailLayout" type="VBoxContainer" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Detail/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Portrait" type="TextureRect" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Detail/Margin/DetailLayout"]
+custom_minimum_size = Vector2(0, 242)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Detail/Margin/DetailLayout"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "选择一只萌灵"
+horizontal_alignment = 1
+
+[node name="Info" type="Label" parent="ModalShell/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/Layout/DexContent/Detail/Margin/DetailLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.42, 0.33, 0.24, 1)
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+text = "状态、属性、栖息地与喜好会显示在这里。"

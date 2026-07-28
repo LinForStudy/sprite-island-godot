@@ -1,6 +1,8 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/gameplay_ui.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dex/dex_panel.tscn" id="9_dex_page"]
+[ext_resource type="PackedScene" path="res://scenes/ui/home/home_panel.tscn" id="10_home_page"]
 [ext_resource type="Theme" path="res://resources/themes/cozy_theme.tres" id="2_theme"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/nav/nav_bestiary.png" id="3_nav_bestiary"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/nav/nav_home.png" id="4_nav_home"]
@@ -8,6 +10,14 @@
 [ext_resource type="Texture2D" path="res://assets/ui/icons/actions/action_clean.png" id="6_action_clean"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/actions/action_interact.png" id="7_action_interact"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/actions/action_rest.png" id="8_action_rest"]
+[ext_resource type="Texture2D" path="res://assets/exploration_points/01_grassland_草丛探索点.png" id="11_area_icon"]
+[ext_resource type="StyleBox" path="res://resources/themes/ui2/world_area_plaque.tres" id="12_area_style"]
+[ext_resource type="StyleBox" path="res://resources/themes/ui2/world_action_normal.tres" id="13_action_normal"]
+[ext_resource type="StyleBox" path="res://resources/themes/ui2/world_action_hover.tres" id="14_action_hover"]
+[ext_resource type="StyleBox" path="res://resources/themes/ui2/world_action_pressed.tres" id="15_action_pressed"]
+[ext_resource type="StyleBox" path="res://resources/themes/ui2/world_action_disabled.tres" id="18_action_disabled"]
+[ext_resource type="StyleBox" path="res://resources/themes/ui2/interaction_prompt_panel.tres" id="16_prompt_style"]
+[ext_resource type="StyleBox" path="res://resources/themes/ui2/input_badge.tres" id="17_input_badge"]
 
 [node name="GameplayUI" type="CanvasLayer"]
 script = ExtResource("1_script")
@@ -44,21 +54,47 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="LocationCard" type="PanelContainer" parent="Root/HUDMargin/ScreenLayout/TopHUD"]
-custom_minimum_size = Vector2(228, 48)
+custom_minimum_size = Vector2(240, 68)
 layout_mode = 2
 mouse_filter = 2
+theme_override_styles/panel = ExtResource("12_area_style")
 
 [node name="LocationPadding" type="MarginContainer" parent="Root/HUDMargin/ScreenLayout/TopHUD/LocationCard"]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 7
 
-[node name="LocationLabel" type="Label" parent="Root/HUDMargin/ScreenLayout/TopHUD/LocationCard/LocationPadding"]
+[node name="AreaLayout" type="HBoxContainer" parent="Root/HUDMargin/ScreenLayout/TopHUD/LocationCard/LocationPadding"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "新手岛 · 迎风广场"
+theme_override_constants/separation = 10
+
+[node name="AreaIcon" type="TextureRect" parent="Root/HUDMargin/ScreenLayout/TopHUD/LocationCard/LocationPadding/AreaLayout"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("11_area_icon")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="AreaText" type="VBoxContainer" parent="Root/HUDMargin/ScreenLayout/TopHUD/LocationCard/LocationPadding/AreaLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="IslandLabel" type="Label" parent="Root/HUDMargin/ScreenLayout/TopHUD/LocationCard/LocationPadding/AreaLayout/AreaText"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
+theme_override_font_sizes/font_size = 20
+text = "新手岛"
+vertical_alignment = 1
+
+[node name="LocationLabel" type="Label" parent="Root/HUDMargin/ScreenLayout/TopHUD/LocationCard/LocationPadding/AreaLayout/AreaText"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.458824, 0.396078, 0.32549, 1)
+theme_override_font_sizes/font_size = 16
+text = "迎风广场"
 vertical_alignment = 1
 
 [node name="TopSpacer" type="Control" parent="Root/HUDMargin/ScreenLayout/TopHUD"]
@@ -72,19 +108,84 @@ theme_override_constants/separation = 12
 alignment = 2
 
 [node name="DexButton" type="Button" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons"]
-custom_minimum_size = Vector2(56, 52)
+custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
-icon = ExtResource("3_nav_bestiary")
-icon_max_width = 28
-tooltip_text = "图鉴"
+theme_override_styles/normal = ExtResource("13_action_normal")
+theme_override_styles/hover = ExtResource("14_action_hover")
+theme_override_styles/pressed = ExtResource("15_action_pressed")
+theme_override_styles/focus = ExtResource("14_action_hover")
+theme_override_styles/disabled = ExtResource("18_action_disabled")
+tooltip_text = "打开萌灵图鉴"
+
+[node name="Content" type="VBoxContainer" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons/DexButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons/DexButton/Content"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("3_nav_bestiary")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons/DexButton/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
+theme_override_font_sizes/font_size = 15
+text = "图鉴"
+horizontal_alignment = 1
 
 [node name="HomeButton" type="Button" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons"]
-custom_minimum_size = Vector2(56, 52)
+custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
-icon = ExtResource("4_nav_home")
-icon_max_width = 28
-tooltip_text = "小屋"
+theme_override_styles/normal = ExtResource("13_action_normal")
+theme_override_styles/hover = ExtResource("14_action_hover")
+theme_override_styles/pressed = ExtResource("15_action_pressed")
+theme_override_styles/focus = ExtResource("14_action_hover")
+theme_override_styles/disabled = ExtResource("18_action_disabled")
+tooltip_text = "进入萌灵小屋"
 
+[node name="Content" type="VBoxContainer" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons/HomeButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons/HomeButton/Content"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("4_nav_home")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Root/HUDMargin/ScreenLayout/TopHUD/ActionButtons/HomeButton/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
+theme_override_font_sizes/font_size = 15
+text = "小屋"
+horizontal_alignment = 1
 [node name="BodySpacer" type="Control" parent="Root/HUDMargin/ScreenLayout"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -126,6 +227,63 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
+[node name="InteractionPrompt" type="PanelContainer" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -140.0
+offset_top = -88.0
+offset_right = 140.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("16_prompt_style")
+
+[node name="PromptPadding" type="MarginContainer" parent="Root/InteractionPrompt"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 7
+
+[node name="PromptLayout" type="HBoxContainer" parent="Root/InteractionPrompt/PromptPadding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="InputBadge" type="PanelContainer" parent="Root/InteractionPrompt/PromptPadding/PromptLayout"]
+custom_minimum_size = Vector2(42, 38)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("17_input_badge")
+
+[node name="InputLabel" type="Label" parent="Root/InteractionPrompt/PromptPadding/PromptLayout/InputBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.976471, 0.913725, 1)
+theme_override_font_sizes/font_size = 20
+text = "E"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ActionIcon" type="TextureRect" parent="Root/InteractionPrompt/PromptPadding/PromptLayout"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("7_action_interact")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ActionText" type="Label" parent="Root/InteractionPrompt/PromptPadding/PromptLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.286275, 0.227451, 0.164706, 1)
+theme_override_font_sizes/font_size = 18
+text = "开始探索"
+vertical_alignment = 1
+
 [node name="AreaIntroToast" type="PanelContainer" parent="Root"]
 layout_mode = 1
 anchors_preset = 10
@@ -165,6 +323,18 @@ text = "迎风广场"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Root"]
 
+[node name="SecondaryModalDimmer" type="Button" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+flat = true
+modulate = Color(0, 0, 0, 0.4)
+
 [node name="HabitatPanel" type="PanelContainer" parent="Root"]
 visible = false
 layout_mode = 1
@@ -194,7 +364,7 @@ layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="HabitatIcon" type="TextureRect" parent="Root/HabitatPanel/HabitatMargin/HabitatBox/HabitatSplit"]
-custom_minimum_size = Vector2(120, 120)
+custom_minimum_size = Vector2(300, 220)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
@@ -222,6 +392,19 @@ theme_override_colors/font_color = Color(0.470588, 0.4, 0.313725, 1)
 theme_override_font_sizes/font_size = 20
 text = "进度"
 
+
+[node name="HabitatPreview" type="VBoxContainer" parent="Root/HabitatPanel/HabitatMargin/HabitatBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PreviewTitle" type="Label" parent="Root/HabitatPanel/HabitatMargin/HabitatBox/HabitatPreview"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "可能出现的萌灵"
+
+[node name="PreviewRow" type="HBoxContainer" parent="Root/HabitatPanel/HabitatMargin/HabitatBox/HabitatPreview"]
+layout_mode = 2
+theme_override_constants/separation = 10
 [node name="HabitatButtons" type="HBoxContainer" parent="Root/HabitatPanel/HabitatMargin/HabitatBox"]
 layout_mode = 2
 theme_override_constants/separation = 12
@@ -268,11 +451,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "遇见萌灵"
 
-[node name="EncounterBody" type="Label" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
+[node name="EncounterPortrait" type="TextureRect" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
+custom_minimum_size = Vector2(0, 190)
 layout_mode = 2
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 20
-text = "介绍"
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
 
 [node name="EncounterStats" type="Label" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
 layout_mode = 2
@@ -280,28 +464,35 @@ autowrap_mode = 3
 theme_override_colors/font_color = Color(0.470588, 0.4, 0.313725, 1)
 theme_override_font_sizes/font_size = 20
 text = "属性"
+horizontal_alignment = 1
 
-[node name="EncounterCaptureButton" type="Button" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
+[node name="EncounterBody" type="Label" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 20
+text = "介绍"
+horizontal_alignment = 1
+
+[node name="EncounterActionRow" type="HBoxContainer" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="EncounterCaptureButton" type="Button" parent="Root/EncounterPanel/EncounterMargin/EncounterBox/EncounterActionRow"]
 visible = false
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 text = "邀请入住"
 
-[node name="EncounterObserveButton" type="Button" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-text = "观察"
-
-[node name="EncounterBattleButton" type="Button" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
-custom_minimum_size = Vector2(0, 60)
+[node name="EncounterBattleButton" type="Button" parent="Root/EncounterPanel/EncounterMargin/EncounterBox/EncounterActionRow"]
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 text = "发起挑战"
 
-[node name="EncounterBackButton" type="Button" parent="Root/EncounterPanel/EncounterMargin/EncounterBox"]
-custom_minimum_size = Vector2(0, 60)
+[node name="EncounterBackButton" type="Button" parent="Root/EncounterPanel/EncounterMargin/EncounterBox/EncounterActionRow"]
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 text = "离开"
-
 [node name="DexPanel" type="PanelContainer" parent="Root"]
 visible = false
 layout_mode = 1
@@ -349,7 +540,7 @@ theme_override_font_sizes/font_size = 20
 text = "详情"
 
 [node name="DexBackButton" type="Button" parent="Root/DexPanel/DexMargin/DexBox"]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 text = "返回地图"
 
@@ -432,7 +623,7 @@ icon_max_width = 32
 text = "恢复全部"
 
 [node name="HomeBackButton" type="Button" parent="Root/HomePanel/HomeMargin/HomeBox"]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 text = "返回地图"
 
@@ -472,15 +663,59 @@ theme_override_font_sizes/font_size = 20
 text = "选择一只出战萌灵。"
 
 [node name="BattleSpiritSelect" type="OptionButton" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox"]
-custom_minimum_size = Vector2(0, 60)
+visible = false
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 
-[node name="BattlePrepStartButton" type="Button" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox"]
-custom_minimum_size = Vector2(0, 64)
+[node name="BattleEmptyLabel" type="Label" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox"]
+visible = false
+custom_minimum_size = Vector2(0, 154)
 layout_mode = 2
-text = "开始挑战"
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.470588, 0.4, 0.313725, 1)
+theme_override_font_sizes/font_size = 19
+text = "还没有可出战的萌灵。先去地图探索，发现并邀请第一位伙伴入住。"
+autowrap_mode = 3
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BattlePrepBackButton" type="Button" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox"]
-custom_minimum_size = Vector2(0, 60)
+[node name="BattleSpiritScroll" type="ScrollContainer" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="BattleSpiritGrid" type="GridContainer" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox/BattleSpiritScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="BattleScrollHint" type="Label" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.470588, 0.4, 0.313725, 1)
+theme_override_font_sizes/font_size = 18
+text = "向下滚动查看更多伙伴"
+horizontal_alignment = 1
+
+[node name="BattlePrepFooter" type="HBoxContainer" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BattlePrepBackButton" type="Button" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox/BattlePrepFooter"]
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 text = "返回遇见"
+
+[node name="BattlePrepStartButton" type="Button" parent="Root/BattlePrepPanel/BattlePrepMargin/BattlePrepBox/BattlePrepFooter"]
+custom_minimum_size = Vector2(260, 64)
+layout_mode = 2
+text = "开始挑战"
+[node name="DexPage" parent="Root" instance=ExtResource("9_dex_page")]
+visible = false
+
+[node name="HomePage" parent="Root" instance=ExtResource("10_home_page")]
+visible = false
