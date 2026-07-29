@@ -42,6 +42,9 @@ powershell -ExecutionPolicy Bypass -File scripts/check-project.ps1
 
 # 六战场与战斗帧资源合同
 & 'C:\Program Files\Godot\Godot_v4.7-stable_win64_console.exe' --headless --path . res://scenes/battle/battle_contract_smoke.tscn
+
+# 设置独立存档、音频总线与资源检查
+& 'C:\Program Files\Godot\Godot_v4.7-stable_win64_console.exe' --headless --path . res://scenes/testing/settings_audio_smoke.tscn
 ```
 
 ## 当前封版缺口
