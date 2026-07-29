@@ -9,6 +9,7 @@ $required = @(
   'docs/phase-1-notes.md',
   'docs/mobile_landscape_roadmap.md',
   'docs/testing_matrix.md',
+  'docs/map-production-spec.md',
   'docs/GODOT_UI_MAP_PLAN.md',
   'docs/ui-kit-integration-report.md',
   'docs/ui-component-library.md',
