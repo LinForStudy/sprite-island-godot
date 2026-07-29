@@ -29,6 +29,9 @@
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/check-project.ps1
+
+# 统一运行时回归：世界/输入/存档/UI/设置音频/战斗 smoke
+powershell -ExecutionPolicy Bypass -File scripts/run-regression.ps1
 ```
 
 还可运行：

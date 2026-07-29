@@ -73,6 +73,7 @@ $required = @(
   'autoload/audio_manager.gd',
   'scripts/verify_settings_audio.gd',
   'scripts/verify_gameplay_balance.gd',
+  'scripts/run-regression.ps1',
   'scenes/testing/settings_audio_smoke.tscn',
   'autoload/save_manager.gd',
   'autoload/game_state.gd',
