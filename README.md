@@ -45,6 +45,9 @@ powershell -ExecutionPolicy Bypass -File scripts/check-project.ps1
 
 # 设置独立存档、音频总线与资源检查
 & 'C:\Program Files\Godot\Godot_v4.7-stable_win64_console.exe' --headless --path . res://scenes/testing/settings_audio_smoke.tscn
+
+# 数值、收服经济和属性克制合同
+& 'C:\Program Files\Godot\Godot_v4.7-stable_win64_console.exe' --headless --path . --script res://scripts/verify_gameplay_balance.gd
 ```
 
 ## 当前封版缺口
