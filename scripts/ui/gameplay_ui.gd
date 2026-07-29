@@ -596,15 +596,17 @@ func _refresh_main_menu_data() -> void:
 		child.queue_free()
 	var compact: bool = DisplayManager.is_mobile_layout() or get_viewport().get_visible_rect().size.y < 560.0
 	var party_ids: Array[String] = SaveManager.get_party_ids() if SaveManager.has_method("get_party_ids") else []
-	if party_ids.is_empty():
+	var captured_ids: Array[String] = SaveManager.get_captured_spirit_ids()
+	if captured_ids.is_empty():
 		main_menu_party_list.add_child(_make_menu_data_label("队伍尚未组建；获得首宠后会显示在这里。", compact))
 	else:
-		for index in range(party_ids.size()):
-			var spirit_id: String = party_ids[index]
+		for spirit_id in captured_ids:
 			var spirit: SpiritData = GameCatalog.get_spirit_by_id(spirit_id)
 			var pet: Dictionary = SaveManager.get_pet_state(spirit_id)
-			var display_name: String = spirit.display_name if spirit != null else spirit_id
-			main_menu_party_list.add_child(_make_menu_data_label("%d. %s  Lv.%d" % [index + 1, display_name, int(pet.get("level", 1))], compact))
+			if spirit == null or pet.is_empty():
+				continue
+			main_menu_party_list.add_child(_make_party_member_button(spirit_id, spirit, pet, party_ids, compact))
+
 	var inventory: Dictionary = Dictionary(SaveManager.get_save_data().get("inventory", {}))
 	var ordered_items: Array[String] = ["star", "pink", "gold", "rainbow", "food", "cleaning_tool", "healing_item"]
 	for raw_id in inventory.keys():
@@ -616,6 +618,39 @@ func _refresh_main_menu_data() -> void:
 			main_menu_inventory_list.add_child(_make_menu_data_label("%s  × %d" % [_item_display_name(item_id), max(0, int(inventory[item_id]))], compact))
 	if main_menu_inventory_list.get_child_count() == 0:
 		main_menu_inventory_list.add_child(_make_menu_data_label("背包目前是空的。", compact))
+
+
+func _make_party_member_button(spirit_id: String, spirit: SpiritData, pet: Dictionary, party_ids: Array[String], compact: bool) -> Button:
+	var in_party: bool = party_ids.has(spirit_id)
+	var button: Button = Button.new()
+	button.custom_minimum_size.y = 42.0 if compact else 52.0
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.text = "%s  Lv.%d    %s" % [spirit.display_name, int(pet.get("level", 1)), "已出战 ✓（点击移出）" if in_party else "点击加入队伍"]
+	button.tooltip_text = "队伍至少保留一只萌灵" if in_party and party_ids.size() <= 1 else "点击调整出战队伍"
+	button.disabled = in_party and party_ids.size() <= 1
+	_style_modal_button(button, in_party)
+	button.pressed.connect(_toggle_party_member.bind(spirit_id))
+	return button
+
+
+func _toggle_party_member(spirit_id: String) -> void:
+	var party_ids: Array[String] = SaveManager.get_party_ids()
+	if party_ids.has(spirit_id):
+		if party_ids.size() <= 1:
+			GameState.set_message("队伍至少需要保留一只萌灵。")
+			return
+		party_ids.erase(spirit_id)
+	elif party_ids.size() >= SaveManager.MAX_PARTY_SIZE:
+		GameState.set_message("队伍最多只能有 %d 只萌灵。" % SaveManager.MAX_PARTY_SIZE)
+		return
+	else:
+		party_ids.append(spirit_id)
+	if not SaveManager.set_party(party_ids):
+		GameState.set_message("队伍调整失败，请再试一次。")
+		return
+	AudioManager.play_ui()
+	_refresh_main_menu_data()
 
 
 func _make_menu_data_label(text_value: String, compact: bool) -> Label:

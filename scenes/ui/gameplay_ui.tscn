@@ -633,7 +633,7 @@ text = "当前出战队伍"
 [node name="Hint" type="Label" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/PartyPage"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.459, 0.396, 0.325, 1)
-text = "最多 3 只萌灵；这里只读展示当前存档内容。"
+text = "最多 3 只萌灵；点击已入住萌灵即可加入或移出队伍。"
 
 [node name="PartyList" type="VBoxContainer" parent="Root/MainMenu/ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/PartyPage"]
 layout_mode = 2
