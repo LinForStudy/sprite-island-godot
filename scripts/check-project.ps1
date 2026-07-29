@@ -222,6 +222,23 @@ foreach ($token in @(
   if ($groveScene -notmatch [regex]::Escape($token)) { throw "grove_gate.tscn missing token: $token" }
 }
 
+$worldLayoutsPath = Join-Path $root 'data/maps/world_visual_layouts.json'
+try {
+  $worldLayouts = Get-Content -Raw -Encoding UTF8 $worldLayoutsPath | ConvertFrom-Json
+} catch {
+  throw "world_visual_layouts.json must contain valid JSON: $($_.Exception.Message)"
+}
+foreach ($mapExpectation in @(@{ Id = 'test_world'; Cells = 487; Blockers = 12 }, @{ Id = 'grove_gate'; Cells = 331; Blockers = 8 })) {
+  $layout = $worldLayouts.($mapExpectation.Id)
+  if ($null -eq $layout) { throw "world_visual_layouts.json missing map: $($mapExpectation.Id)" }
+  if (@($layout.map_size).Count -ne 2 -or [int]$layout.map_size[0] -ne 96 -or [int]$layout.map_size[1] -ne 54) { throw "map $($mapExpectation.Id) must declare a 96x54 logical size" }
+  if (@($layout.collision_cells).Count -ne $mapExpectation.Cells) { throw "map $($mapExpectation.Id) collision cell count changed unexpectedly" }
+  if (@($layout.collision_blockers).Count -ne $mapExpectation.Blockers) { throw "map $($mapExpectation.Id) collision blocker count changed unexpectedly" }
+}
+$worldScript = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scripts/world/world_scene.gd')
+if ($worldScript -notmatch [regex]::Escape('collision_cells')) { throw 'world_scene.gd must load collision cells from world_visual_layouts.json' }
+if ($worldScript -match [regex]::Escape('func _build_border_colliders')) { throw 'world_scene.gd must not rebuild legacy TileMap collision in code' }
+
 $habitatPointScene = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'scenes/world/habitat_point.tscn')
 foreach ($token in @(
   '[node name="PointSprite" type="Sprite2D" parent="."]',

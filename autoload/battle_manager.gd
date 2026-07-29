@@ -249,12 +249,16 @@ func try_capture_after_battle() -> String:
 		battle_state_changed.emit()
 		return "missing_ball"
 	battle_result.capture_attempted = true
+	var was_prototype_complete: bool = SaveManager.is_prototype_complete()
 	var success: bool = randf() <= float(battle_result.capture_chance)
 	var habitat_id: String = String(battle_state.get("habitat_id", ""))
 	if success and SaveManager.capture_spirit(enemy_spirit, habitat_id):
 		battle_result.capture_status = "captured"
 		battle_result.capture_eligible = false
 		battle_result.capture_message = "%s愿意住进小屋啦！" % enemy_spirit.display_name
+		if not was_prototype_complete and SaveManager.is_prototype_complete():
+			battle_result.capture_message += "\n" + SaveManager.get_prototype_completion_summary()
+		AudioManager.play_capture()
 		GameState.set_message(String(battle_result.capture_message))
 		battle_state_changed.emit()
 		return "captured"

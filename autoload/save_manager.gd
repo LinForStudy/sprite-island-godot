@@ -102,6 +102,15 @@ func consume_item(item_id: String, amount: int = 1) -> bool:
 func is_prototype_complete() -> bool:
 	return bool(get_tutorial_progress().get("prototype_completed", false))
 
+func get_prototype_completion_summary() -> String:
+	var completed_regions: int = 0
+	var capture_counts: Dictionary = Dictionary(save_data.get("habitat_capture_counts", {}))
+	for habitat_id in HABITAT_IDS:
+		if int(capture_counts.get(habitat_id, 0)) > 0:
+			completed_regions += 1
+	var party_count: int = get_party_ids().size()
+	return "主线原型完成！\n地区进度：%d/%d · 图鉴：%d/%d · 队伍：%d/%d\n云台的风把新的旅程带到了小岛上，仍可继续自由收集。" % [completed_regions, HABITAT_IDS.size(), get_captured_spirit_ids().size(), GameCatalog.get_spirits().size(), party_count, MAX_PARTY_SIZE]
+
 func is_habitat_unlocked(habitat_id: String) -> bool:
 	return bool(Dictionary(save_data.get("unlocked_habitats", {"grassland": true})).get(habitat_id, false))
 

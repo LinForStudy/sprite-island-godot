@@ -84,6 +84,7 @@ func _check_unlock_sequence() -> void:
 	_expect(not manager.is_prototype_complete(), "prototype should remain incomplete before cloud capture")
 	manager.capture_spirit(GameCatalogScript.get_spirit_by_id("cloudchick"), "cloud")
 	_expect(manager.is_prototype_complete(), "cloud capture should complete the prototype")
+	_expect(String(manager.get_prototype_completion_summary()).contains("地区进度：6/6"), "prototype completion summary should expose completed region progress")
 	_expect(manager.get_party_ids().size() == 3, "automatic party fill must stop at three")
 	_expect(String(manager.get_pet_state("cloudchick").get("origin_habitat_id", "")) == "cloud", "wild capture should record origin habitat")
 

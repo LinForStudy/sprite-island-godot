@@ -491,8 +491,8 @@ func _refresh_battle_prep_panel() -> void:
 		child.queue_free()
 
 	var selectable_ids: Array[String] = []
-	var captured_ids: Array[String] = SaveManager.get_captured_spirit_ids()
-	for spirit_id in captured_ids:
+	var party_ids: Array[String] = SaveManager.get_party_ids()
+	for spirit_id in party_ids:
 		var spirit: SpiritData = GameCatalog.get_spirit_by_id(spirit_id)
 		var pet: Dictionary = SaveManager.get_pet_state(spirit_id)
 		if spirit == null or pet.is_empty():
@@ -505,7 +505,7 @@ func _refresh_battle_prep_panel() -> void:
 		battle_empty_label.visible = true
 		battle_spirit_scroll.visible = false
 		battle_scroll_hint.visible = false
-		battle_prep_info.text = "先邀请一只萌灵入住，再回来发起挑战。"
+		battle_prep_info.text = "先让一只萌灵加入队伍，再回来发起挑战。"
 		battle_prep_start_button.disabled = true
 		return
 
