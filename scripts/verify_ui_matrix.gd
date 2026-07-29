@@ -11,6 +11,7 @@ const CASES: Array[Dictionary] = [
 
 var display_manager: Node
 var game_state: Node
+var settings_manager: Node
 
 
 func _initialize() -> void:
@@ -20,6 +21,7 @@ func _initialize() -> void:
 func _run() -> void:
 	display_manager = root.get_node("/root/DisplayManager")
 	game_state = root.get_node("/root/GameState")
+	settings_manager = root.get_node("/root/SettingsManager")
 	for test_case in CASES:
 		root.size = test_case.size
 		for _frame in range(2):
@@ -55,6 +57,30 @@ func _run() -> void:
 			_fail("%s could not open the HUD main menu" % String(test_case.name))
 			return
 		_assert_inside(main_menu.get_node("ModalCenter/ModalPanel") as Control, visible_size, "%s main menu" % String(test_case.name))
+		if _has_failed():
+			return
+		gameplay.call("_set_main_menu_page", "settings", false)
+		await process_frame
+		var settings_page: Control = main_menu.get_node("ModalCenter/ModalPanel/PanelMargin/PanelLayout/Content/MenuLayout/PageHost/SettingsPage") as Control
+		if not settings_page.visible:
+			_fail("%s could not open the settings page" % String(test_case.name))
+			return
+		var master_slider: HSlider = settings_page.get_node("MasterRow/Slider") as HSlider
+		var master_value: Label = settings_page.get_node("MasterRow/Value") as Label
+		var fullscreen_check: CheckButton = settings_page.get_node("FullscreenCheck") as CheckButton
+		master_slider.value = 0.60
+		await process_frame
+		if not is_equal_approx(float(Dictionary(settings_manager.call("get_settings")).get("master_volume", -1.0)), 0.60) or master_value.text != "60%":
+			_fail("%s settings slider did not update its saved value and label" % String(test_case.name))
+			return
+		fullscreen_check.button_pressed = true
+		await process_frame
+		if not bool(Dictionary(settings_manager.call("get_settings")).get("fullscreen", false)):
+			_fail("%s fullscreen setting did not update from the UI" % String(test_case.name))
+			return
+		fullscreen_check.button_pressed = false
+		await process_frame
+		_assert_inside(settings_page, visible_size, "%s settings" % String(test_case.name))
 		if _has_failed():
 			return
 		main_menu.call("close")
